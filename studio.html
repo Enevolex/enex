@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: file:; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Enex</title>
+<style>
+  :root {
+    --bg: #0b0a12; --panel: #12111c; --panel-2: #191826; --panel-3: #211f31;
+    --line: rgba(255,255,255,.07); --line-2: rgba(255,255,255,.13);
+    --text: #ecebf5; --muted: #8e8ca6; --accent: #a78bfa; --accent-ink: #0b0a12;
+    --ok: #4ade80; --bad: #f87171; --warn: #facc15;
+    --r: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    font: 14px/1.45 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    background: var(--bg); color: var(--text); display: flex; overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { flex: 1; overflow-y: auto; padding: 26px 28px 36px; }
+  aside {
+    width: 316px; flex: none; background: var(--panel); border-left: 1px solid var(--line);
+    padding: 22px 22px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 26px;
+  }
+
+  /* ---------- Başlık ---------- */
+  header.top { display: flex; align-items: center; gap: 14px; }
+  header.top img { width: 40px; height: 40px; flex: none; }
+  header.top .titles { flex: 1; min-width: 0; }
+  h1 { font: 700 24px/1.15 "Segoe UI Variable Display", "Segoe UI", sans-serif; letter-spacing: -.02em; }
+  .lead { color: var(--muted); font-size: 13.5px; margin-top: 4px; }
+
+  /* ---------- Tema kartları ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 22px; }
+  .card {
+    appearance: none; font: inherit; color: inherit; text-align: left; cursor: pointer; padding: 0;
+    display: flex; flex-direction: column; border-radius: 16px; overflow: hidden;
+    background: var(--panel); border: 1px solid var(--line);
+    transition: transform .18s cubic-bezier(.2,.8,.2,1), border-color .18s ease, box-shadow .18s ease;
+  }
+  .card:hover { transform: translateY(-2px); border-color: var(--line-2); box-shadow: 0 14px 30px -18px rgba(0,0,0,.8); }
+  .card:active { transform: translateY(0); }
+  .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .card.active { border-color: var(--c1); box-shadow: 0 0 0 1px var(--c1), 0 16px 40px -20px var(--c1); }
+  .shot { aspect-ratio: 1400 / 820; background: #000 center / cover no-repeat; position: relative; }
+  .badge {
+    position: absolute; top: 10px; right: 10px; background: var(--c1); color: #0b0a12; font-size: 10.5px; font-weight: 700;
+    padding: 4px 9px; border-radius: 999px; letter-spacing: .06em; display: none;
+  }
+  .card.active .badge { display: block; }
+  .meta { padding: 13px 15px 15px; display: flex; flex-direction: column; gap: 5px; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .name { font-weight: 650; font-size: 15px; }
+  .sw { display: flex; gap: 4px; }
+  .sw i { width: 11px; height: 11px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); display: block; }
+  .desc { color: var(--muted); font-size: 12.5px; }
+
+  /* ---------- Yan panel ---------- */
+  .group h2 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 650; margin-bottom: 10px; }
+  .toggle { display: flex; gap: 12px; align-items: flex-start; padding: 11px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .toggle:last-child { border-bottom: none; }
+  .toggle .txt { flex: 1; }
+  .toggle b { font-weight: 600; font-size: 14px; display: block; }
+  .toggle small { color: var(--muted); font-size: 12px; display: block; margin-top: 2px; }
+  .switch { position: relative; width: 40px; height: 22px; flex: none; margin-top: 1px; }
+  .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .switch span { position: absolute; inset: 0; background: #2d2b3d; border-radius: 999px; transition: background .18s; }
+  .switch span::after {
+    content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff;
+    border-radius: 50%; transition: transform .2s cubic-bezier(.3,1.4,.6,1); box-shadow: 0 1px 3px rgba(0,0,0,.4);
+  }
+  .switch input:checked + span { background: var(--accent); }
+  .switch input:checked + span::after { transform: translateX(18px); }
+  .switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* Butonlar: tek ölçü (34 px), net durumlar */
+  .btn {
+    appearance: none; font-family: inherit; font-size: 13px; font-weight: 600; line-height: 1; color: var(--text);
+    height: 34px; padding: 0 14px; border-radius: var(--r); cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap;
+    background: var(--panel-2); border: 1px solid var(--line-2);
+    transition: background .15s ease, border-color .15s ease, filter .15s ease, opacity .15s ease;
+  }
+  .btn:hover:not(:disabled) { background: var(--panel-3); border-color: rgba(255,255,255,.2); }
+  .btn:active:not(:disabled) { filter: brightness(.92); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .btn.primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.08); }
+  .btn.block { width: 100%; }
+  .btn .spin {
+    width: 12px; height: 12px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent;
+    animation: spin .7s linear infinite; display: none;
+  }
+  .btn.busy .spin { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .seg { display: flex; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r); padding: 3px; gap: 3px; }
+  .seg button {
+    appearance: none; flex: 1; font-family: inherit; font-size: 12.5px; font-weight: 600; line-height: 1; color: var(--muted);
+    height: 28px; border: 0; border-radius: 7px; background: transparent; cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .seg button:hover:not(.on) { color: var(--text); background: rgba(255,255,255,.05); }
+  .seg button.on { background: var(--accent); color: var(--accent-ink); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  header .seg { width: 210px; flex: none; }
+
+  .field { display: flex; flex-direction: column; gap: 8px; padding: 10px 0 2px; }
+  .field label { font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; }
+  .field label output { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .wall { display: flex; flex-direction: column; gap: 10px; }
+  .wall .cur { font-size: 13px; color: var(--muted); word-break: break-all; }
+  .wall .cur b { color: var(--text); font-weight: 600; }
+  .accent-row { display: flex; gap: 10px; align-items: center; }
+  input[type=color] {
+    width: 46px; height: 34px; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--panel-2);
+    padding: 3px; cursor: pointer;
+  }
+  input[type=color]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  .status { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 6px 0 2px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #6b7280; flex: none; }
+  .dot.on { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  .dot.search { background: var(--warn); box-shadow: 0 0 8px var(--warn); animation: blink 1s infinite; }
+  .dot.error { background: var(--bad); box-shadow: 0 0 8px var(--bad); }
+  @keyframes blink { 50% { opacity: .35; } }
+  .result { font-size: 12.5px; margin-top: 8px; min-height: 1em; }
+  .result.ok { color: var(--ok); } .result.bad { color: var(--bad); }
+  kbd {
+    font: 11px "Cascadia Mono", Consolas, monospace; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 5px; padding: 1px 5px;
+  }
+  .keys { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; font-size: 12.5px; color: var(--muted); align-items: center; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+  <main>
+    <header class="top">
+      <img src="assets/logo.svg" alt="">
+      <div class="titles">
+        <h1 data-i="studio.title"></h1>
+        <p class="lead" data-i="studio.lead"></p>
+      </div>
+      <div class="seg" id="langSeg" role="group"></div>
+    </header>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <aside>
+    <section class="group">
+      <h2 data-i="studio.look"></h2>
+      <label class="toggle">
+        <span class="txt"><b data-i="studio.fx"></b><small data-i="studio.fx.hint"></small></span>
+        <span class="switch"><input type="checkbox" id="fx"><span></span></span>
+      </label>
+      <label class="toggle">
+        <span class="txt"><b data-i="studio.cards"></b><small data-i="studio.cards.hint"></small></span>
+        <span class="switch"><input type="checkbox" id="cards"><span></span></span>
+      </label>
+      <label class="toggle">
+        <span class="txt"><b data-i="studio.clean"></b><small data-i="studio.clean.hint"></small></span>
+        <span class="switch"><input type="checkbox" id="clean"><span></span></span>
+      </label>
+    </section>
+
+    <section class="group" id="themeOpts" hidden></section>
+
+    <section class="group">
+      <h2 data-i="studio.network"></h2>
+      <label class="toggle">
+        <span class="txt"><b data-i="studio.dpi"></b><small data-i="studio.dpi.hint"></small></span>
+        <span class="switch"><input type="checkbox" id="dpi"><span></span></span>
+      </label>
+      <div class="status"><span class="dot" id="dpiDot"></span><span id="dpiText"></span></div>
+      <p class="hint" data-i="studio.dpi.auto"></p>
+      <div class="btns" style="margin-top:10px">
+        <button class="btn" id="dpiTest"><span class="spin"></span><span data-i="studio.dpi.test"></span></button>
+        <button class="btn" id="dpiResearch"><span class="spin"></span><span data-i="studio.dpi.research"></span></button>
+      </div>
+      <p class="result" id="dpiResult" role="status"></p>
+    </section>
+
+    <section class="group">
+      <h2 data-i="studio.accent"></h2>
+      <div class="accent-row">
+        <input type="color" id="accent">
+        <button class="btn" id="resetAccent" data-i="studio.accent.reset"></button>
+      </div>
+      <p class="hint" id="accentHint"></p>
+    </section>
+
+    <section class="group">
+      <h2 data-i="studio.shortcuts"></h2>
+      <div class="keys">
+        <span><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>T</kbd></span><span data-i="studio.key.studio"></span>
+        <span><kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>1–8</kbd></span><span data-i="studio.key.themes"></span>
+        <span><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>E</kbd></span><span data-i="studio.key.fx"></span>
+        <span><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>L</kbd></span><span data-i="studio.key.cards"></span>
+      </div>
+    </section>
+  </aside>
+
+<script>
+  let state = null;
+  let accentTimer = null;
+  const $ = (id) => document.getElementById(id);
+  const S = (key, vars) => {
+    let s = (state && state.strings && state.strings[key]) || key;
+    if (vars) s = s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '');
+    return s;
+  };
+  const el = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  };
+
+  function applyStrings() {
+    document.documentElement.lang = state.lang;
+    document.title = S('app.studio');
+    document.querySelectorAll('[data-i]').forEach((n) => { n.textContent = S(n.dataset.i); });
+  }
+
+  function renderLang() {
+    const seg = $('langSeg');
+    seg.innerHTML = '';
+    seg.setAttribute('aria-label', S('studio.language'));
+    for (const [val, label] of [['auto', S('studio.lang.auto')], ['tr', 'Türkçe'], ['en', 'English']]) {
+      const b = el('button', state.settings.lang === val ? 'on' : '', label);
+      b.setAttribute('aria-pressed', state.settings.lang === val);
+      b.addEventListener('click', () => set({ lang: val }));
+      seg.appendChild(b);
+    }
+  }
+
+  function renderGrid() {
+    const { settings, themes } = state;
+    const grid = $('grid');
+    grid.innerHTML = '';
+    for (const t of themes) {
+      const active = t.id === settings.theme;
+      const b = el('button', 'card' + (active ? ' active' : ''));
+      b.style.setProperty('--c1', t.colors[1]);
+      b.setAttribute('aria-pressed', active);
+      const shot = el('div', 'shot');
+      shot.style.backgroundImage = `url("previews/${t.id}.jpg")`;
+      shot.appendChild(el('span', 'badge', S('studio.active')));
+      const meta = el('div', 'meta');
+      const row = el('div', 'row');
+      const sw = el('span', 'sw');
+      for (const c of t.colors) { const i = el('i'); i.style.background = c; sw.appendChild(i); }
+      row.append(el('span', 'name', t.name), sw);
+      meta.append(row, el('span', 'desc', t.desc));
+      b.append(shot, meta);
+      b.addEventListener('click', () => set({ theme: t.id }));
+      grid.appendChild(b);
+    }
+  }
+
+  function slider(label, key, value, max) {
+    const f = el('div', 'field');
+    const l = el('label', null, label);
+    l.htmlFor = 'r-' + key;
+    const out = el('output', null, Math.round(value * 100) + '%');
+    l.appendChild(out);
+    const r = el('input');
+    Object.assign(r, { type: 'range', id: 'r-' + key, min: 0, max, step: 0.01, value });
+    let tm = null;
+    r.addEventListener('input', () => {
+      out.textContent = Math.round(r.value * 100) + '%';
+      clearTimeout(tm);
+      tm = setTimeout(() => set({ [key]: Number(r.value) }, true), 90);
+    });
+    f.append(l, r);
+    return f;
+  }
+
+  function renderThemeOpts() {
+    const box = $('themeOpts');
+    const { settings } = state;
+    box.innerHTML = '';
+    if (settings.theme !== 'glass' && settings.theme !== 'anime') { box.hidden = true; return; }
+    box.hidden = false;
+
+    if (settings.theme === 'glass') {
+      box.appendChild(el('h2', null, S('studio.glass')));
+      const seg = el('div', 'seg');
+      for (const [val, key] of [['acrylic', 'studio.glass.acrylic'], ['clear', 'studio.glass.clear']]) {
+        const b = el('button', settings.glassMode === val ? 'on' : '', S(key));
+        b.addEventListener('click', () => set({ glassMode: val }));
+        seg.appendChild(b);
+      }
+      box.append(seg,
+        el('p', 'hint', S(settings.glassMode === 'clear' ? 'studio.glass.clearHint' : 'studio.glass.acrylicHint')),
+        slider(S('studio.panelAlpha'), 'glassAlpha', settings.glassAlpha, 0.9));
+    } else {
+      box.appendChild(el('h2', null, S('studio.anime')));
+      const wall = el('div', 'wall');
+      const cur = el('div', 'cur', S('studio.wallpaper') + ': ');
+      cur.appendChild(el('b', null, state.wallpaperName || S(state.bundledIsAnime ? 'studio.wall.bundledAnime' : 'studio.wall.sakura')));
+      const btns = el('div', 'btns');
+      const pick = el('button', 'btn primary', S('studio.wall.pick'));
+      pick.addEventListener('click', async () => { state = await window.studio.pickWallpaper(); render(); });
+      btns.appendChild(pick);
+      if (state.wallpaperName) {
+        const reset = el('button', 'btn', S('studio.wall.reset'));
+        reset.addEventListener('click', () => set({ wallpaper: null }));
+        btns.appendChild(reset);
+      }
+      wall.append(cur, btns, el('p', 'hint', S('studio.wall.hint')));
+      box.append(wall,
+        slider(S('studio.panelAlpha'), 'animeAlpha', settings.animeAlpha, 0.9),
+        slider(S('studio.wallDim'), 'wallDim', settings.wallDim, 0.85));
+    }
+  }
+
+  function renderDpi() {
+    const { settings, dpi } = state;
+    $('dpi').checked = settings.dpiEnabled;
+    $('dpiDot').className = 'dot ' + (dpi?.state || '');
+    $('dpiText').textContent = dpi?.message || '';
+    const busy = dpi?.state === 'search';
+    $('dpiResearch').disabled = !settings.dpiEnabled || busy;
+    $('dpiResearch').classList.toggle('busy', busy);
+    $('dpiTest').disabled = busy;
+  }
+
+  function render() {
+    const { settings, themes } = state;
+    const current = themes.find((t) => t.id === settings.theme) || themes[0];
+    const accent = settings.accent || current.colors[1];
+    document.documentElement.style.setProperty('--accent', accent);
+    applyStrings();
+    renderLang();
+    renderGrid();
+    renderThemeOpts();
+    renderDpi();
+    $('fx').checked = settings.fx;
+    $('cards').checked = settings.cards;
+    $('clean').checked = settings.clean;
+    $('accent').value = accent;
+    $('accent').setAttribute('aria-label', S('studio.accent'));
+    $('accentHint').textContent = settings.accent ? S('studio.accent.custom') : S('studio.accent.theme', { theme: current.name });
+  }
+
+  async function set(patch, quiet) {
+    state = await window.studio.set(patch);
+    if (!quiet) render();
+  }
+
+  $('fx').addEventListener('change', (e) => set({ fx: e.target.checked }));
+  $('cards').addEventListener('change', (e) => set({ cards: e.target.checked }));
+  $('clean').addEventListener('change', (e) => set({ clean: e.target.checked }));
+  $('dpi').addEventListener('change', (e) => {
+    $('dpiText').textContent = S('studio.dpi.restarting');
+    $('dpiDot').className = 'dot search';
+    $('dpiResult').textContent = '';
+    set({ dpiEnabled: e.target.checked });
+  });
+  $('dpiTest').addEventListener('click', async () => {
+    const b = $('dpiTest'), out = $('dpiResult');
+    b.classList.add('busy'); b.disabled = true;
+    out.className = 'result'; out.textContent = S('studio.dpi.testing');
+    const r = await window.studio.testDpi();
+    b.classList.remove('busy'); b.disabled = false;
+    out.className = 'result ' + (r.ok ? 'ok' : 'bad');
+    out.textContent = (r.ok ? '✓ ' : '✕ ') + r.message;
+  });
+  $('dpiResearch').addEventListener('click', async () => {
+    $('dpiResult').textContent = '';
+    state.dpi = { state: 'search', message: S('dpi.searching', { i: 1, n: '…' }) };
+    renderDpi();
+    state = await window.studio.researchDpi();
+    render();
+  });
+  $('accent').addEventListener('input', () => {
+    clearTimeout(accentTimer);
+    accentTimer = setTimeout(() => set({ accent: $('accent').value }), 120);
+  });
+  $('resetAccent').addEventListener('click', () => set({ accent: null }));
+  window.studio.onDpi((d) => { if (state) { state.dpi = d; renderDpi(); } });
+  window.studio.onState((s) => {
+    // Kaydırıcı sürüklenirken paneli yeniden çizme
+    const dragging = document.activeElement && document.activeElement.type === 'range';
+    state = s;
+    if (!dragging) render();
+  });
+
+  window.studio.getState().then((s) => { state = s; render(); });
+</script>
+</body>
+</html>

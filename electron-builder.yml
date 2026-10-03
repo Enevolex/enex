@@ -1,0 +1,38 @@
+appId: com.enex.app
+productName: Enex
+directories:
+  output: dist
+  buildResources: build
+files:
+  - main.js
+  - i18n.js
+  - loading.html
+  - picker.html
+  - picker-preload.js
+  - studio.html
+  - studio-preload.js
+  - discord-preload.js
+  - assets/logo.svg
+  - wallpapers/**
+  - themes/**
+  - previews/**
+  - build/icon.ico
+  - bin/**
+  - package.json
+asarUnpack:
+  - wallpapers/**
+  - bin/**
+win:
+  target: nsis
+  icon: build/icon.ico
+nsis:
+  oneClick: true
+  perMachine: false
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: Enex
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  artifactName: Enex-Setup.exe

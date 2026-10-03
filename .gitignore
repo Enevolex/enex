@@ -1,0 +1,26 @@
+# bagimliliklar / dependencies
+node_modules/
+
+# derleme ciktisi / build output (build/ klasoru ikonlari tuttugu icin ignore EDILMEZ)
+dist/
+out/
+release/
+
+# loglar
+*.log
+npm-debug.log*
+
+# sistem / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cache/
+
+# gizli bilgiler
+.env
+.env.*

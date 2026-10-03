@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Enex</title>
+<style>
+  :root {
+    --void: #07060f; --violet: #8b5cf6; --cyan: #22d3ee; --pink: #ec4899;
+    --text: #ece9ff; --muted: #9a94c4; --line: rgba(167,139,250,.18);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(60% 50% at 10% 0%, rgba(139,92,246,.35), transparent 70%),
+      radial-gradient(50% 50% at 100% 100%, rgba(34,211,238,.22), transparent 70%),
+      var(--void);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  header { padding: 22px 26px 10px; }
+  h1 {
+    font-size: 22px; font-weight: 700; letter-spacing: -.01em;
+    background: linear-gradient(90deg, #fff, #c4b5fd 45%, var(--cyan));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  p.sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .tabs { display: flex; gap: 8px; padding: 10px 26px; }
+  .tab {
+    border: 1px solid var(--line); background: rgba(255,255,255,.03); color: var(--muted);
+    padding: 7px 16px; border-radius: 999px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .tab.active { color: #fff; border-color: transparent;
+    background: linear-gradient(90deg, var(--violet), var(--pink)); }
+  main {
+    flex: 1; overflow-y: auto; padding: 8px 26px 18px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px;
+    align-content: start;
+  }
+  .card {
+    border: 1px solid var(--line); border-radius: 14px; padding: 10px;
+    background: rgba(18,15,38,.6); cursor: pointer; text-align: left; color: inherit; font: inherit;
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+  .card:hover, .card:focus-visible {
+    transform: translateY(-2px); outline: none; border-color: rgba(139,92,246,.7);
+    box-shadow: 0 0 0 1px rgba(139,92,246,.4), 0 10px 30px -10px rgba(139,92,246,.6);
+  }
+  .card img { width: 100%; aspect-ratio: 16/9; object-fit: contain; border-radius: 8px; background: #000; display: block; }
+  .card span { display: block; margin-top: 8px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  footer { padding: 12px 26px 18px; display: flex; justify-content: flex-end; border-top: 1px solid var(--line); }
+  .cancel {
+    appearance: none; height: 34px; padding: 0 16px; border-radius: 10px; cursor: pointer;
+    border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04); color: var(--text);
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .cancel:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22); }
+  .cancel:focus-visible, .tab:focus-visible { outline: 2px solid var(--violet); outline-offset: 2px; }
+  .empty { color: var(--muted); grid-column: 1 / -1; padding: 40px 0; text-align: center; }
+</style>
+</head>
+<body>
+  <header>
+    <h1 data-i="picker.title"></h1>
+    <p class="sub" data-i="picker.sub"></p>
+  </header>
+  <div class="tabs">
+    <button class="tab active" data-kind="screen" data-i="picker.screens"></button>
+    <button class="tab" data-kind="window" data-i="picker.windows"></button>
+  </div>
+  <main id="grid"></main>
+  <footer><button class="cancel" id="cancel" data-i="picker.cancel"></button></footer>
+<script>
+  let sources = [];
+  let strings = {};
+  const S = (k) => strings[k] || k;
+  let kind = 'screen';
+  const grid = document.getElementById('grid');
+
+  function render() {
+    grid.innerHTML = '';
+    const list = sources.filter(s => (kind === 'screen') === s.isScreen);
+    if (!list.length) {
+      const e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = S('picker.empty');
+      grid.appendChild(e);
+      return;
+    }
+    for (const s of list) {
+      const b = document.createElement('button');
+      b.className = 'card';
+      const img = document.createElement('img');
+      img.src = s.thumbnail;
+      img.alt = '';
+      const label = document.createElement('span');
+      label.textContent = s.name;
+      b.append(img, label);
+      b.addEventListener('click', () => window.picker.choose(s.id));
+      grid.appendChild(b);
+    }
+  }
+
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === t));
+    kind = t.dataset.kind;
+    render();
+  }));
+  document.getElementById('cancel').addEventListener('click', () => window.picker.choose(null));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') window.picker.choose(null); });
+
+  window.picker.getSources().then(res => {
+    strings = res.strings || {};
+    sources = res.sources || [];
+    document.title = S('picker.title');
+    document.querySelectorAll('[data-i]').forEach(n => { n.textContent = S(n.dataset.i); });
+    render();
+  });
+</script>
+</body>
+</html>

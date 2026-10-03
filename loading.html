@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' file:; style-src 'unsafe-inline'">
+<title>Enex</title>
+<style>
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+    font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif; color: #e7e6ef; user-select: none;
+    background:
+      radial-gradient(40% 50% at 20% 10%, rgba(139, 92, 246, .35), transparent 70%),
+      radial-gradient(40% 50% at 85% 90%, rgba(34, 211, 238, .2), transparent 70%),
+      #07060f;
+  }
+  .logo {
+    width: 96px; height: 96px; display: block;
+    filter: drop-shadow(0 0 28px rgba(167, 139, 250, .55));
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(244, 114, 182, .7)); } }
+  .word { font: 700 22px/1 "Segoe UI Variable Display", "Segoe UI", sans-serif; letter-spacing: .32em; margin-right: -.32em;
+    background: linear-gradient(90deg, #b39dff, #f472b6, #38d9f5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .bar { width: 220px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
+  .bar i {
+    display: block; width: 40%; height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899, #22d3ee);
+    animation: slide 1.3s cubic-bezier(.65, 0, .35, 1) infinite;
+  }
+  @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+  /* Tema arka planlarının (body::before/after) üstünde dursun */
+  .stage { position: relative; z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  #nx-loading-text { font-size: 13px; color: #9a97b0; min-height: 1.2em; text-align: center; padding: 0 20px; }
+</style>
+</head>
+<body>
+  <div class="stage">
+  <img class="logo" src="assets/logo.svg" alt="">
+  <div class="word">ENEX</div>
+  <div class="bar"><i></i></div>
+  <div id="nx-loading-text">…</div>
+  </div>
+</body>
+</html>
