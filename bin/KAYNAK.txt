@@ -1,0 +1,4 @@
+ciadpi.exe: ByeDPI (https://github.com/hufrea/byedpi) kaynak kodundan derlendi.
+commit: ba532298de7b28cfe854aea83d061369d13ca290
+Derleme: make windows CC=x86_64-w64-mingw32-gcc, sonra strip
+SHA256: ca28651b9e3218592c9c67671df6225af25f07d283e5089806d7de972cb35b2d
