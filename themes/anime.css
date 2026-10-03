@@ -1,0 +1,64 @@
+/* ANİME — arkada hareketli duvar kağıdı (varsayılan: Sakura Gecesi, ya da kendi videon).
+   Panel koyuluğu ve karartma Tema Stüdyosu'ndan ayarlanır. */
+html:root {
+  --nx-void: #0b0b2b;
+  --nx-backdrop: transparent;
+  --nx-bg-rail: rgba(14, 10, 32, 0.55);
+  --nx-bg-side: rgba(14, 10, 32, 0.45);
+  --nx-bg-chat: rgba(14, 10, 32, 0.37);
+  --nx-bg-elev: rgba(22, 16, 46, 0.95);
+  --nx-bg-elev-2: rgba(30, 22, 60, 0.97);
+  --nx-bg-input: rgba(14, 10, 32, 0.6);
+  --nx-hover: rgba(255, 179, 207, 0.08);
+  --nx-active: rgba(255, 179, 207, 0.13);
+  --nx-selected: rgba(255, 143, 184, 0.22);
+  --nx-line: rgba(255, 214, 230, 0.13);
+  --nx-line-strong: rgba(255, 214, 230, 0.25);
+  --nx-accent: #ff8fb8;
+  --nx-accent-2: #ffd27a;
+  --nx-accent-3: #9fe7ff;
+  --nx-accent-ink: #2a0b1a;
+  --nx-grad: linear-gradient(120deg, #ffb3cf, #ff8fb8 50%, #c8a2ff);
+  --nx-glow: rgba(255, 143, 184, 0.75);
+  --nx-text: #fff5f9;
+  --nx-text-2: #f1d9e6;
+  --nx-muted: #cfb3c6;
+  --nx-faint: #6e5672;
+  --nx-head: #ffffff;
+  --nx-link: #9fe7ff;
+  --nx-mention-bg: rgba(255, 210, 122, 0.24);
+  --nx-mention-fg: #ffe6b0;
+  --nx-mention-row: rgba(255, 210, 122, 0.1);
+  --nx-radius: 16px;
+  --nx-radius-sm: 10px;
+  --nx-scroll: rgba(255, 179, 207, 0.5);
+  --nx-msg-hover: linear-gradient(90deg, rgba(255, 179, 207, 0.1), transparent 80%);
+}
+
+li[id^="chat-messages-"],
+[class*="sidebar_"] [class*="name_"],
+[class*="containerDefault_"] h3,
+[class*="members_"] [class*="member_"],
+[class*="chat_"] > section[class*="title_"] {
+  text-shadow: 0 1px 3px rgba(10, 4, 30, 0.7);
+}
+[class*="sidebar_"] header h1,
+[class*="sidebar_"] header [class*="name_"] {
+  color: #fff !important;
+  text-shadow: 0 0 12px rgba(255, 143, 184, 0.8), 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+[class*="modeSelected_"] [class*="link_"],
+[class*="sidebar_"] [aria-current="page"] {
+  background: linear-gradient(90deg, rgba(255, 143, 184, 0.35), rgba(200, 162, 255, 0.12) 80%, transparent) !important;
+  box-shadow: inset 2px 0 0 #ffb3cf !important;
+}
+
+/* Efektler: buzlu cam paneller */
+html[data-nx-fx] nav[class*="guilds_"],
+html[data-nx-fx] [class^="sidebar_"],
+html[data-nx-fx] [class^="members_"],
+html[data-nx-fx] form [class*="channelTextArea_"],
+html[data-nx-fx] [class*="menu_"][role="menu"],
+html[data-nx-fx] [class*="popout_"] {
+  backdrop-filter: blur(14px) saturate(140%);
+}

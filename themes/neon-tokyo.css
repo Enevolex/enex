@@ -1,0 +1,129 @@
+/* NEON TOKYO — siberpunk: keskin köşeler, sarı-camgöbeği neon, tarama çizgileri */
+html:root {
+  --nx-void: #050508;
+  --nx-backdrop:
+    linear-gradient(115deg, transparent 0 62%, rgba(255, 42, 109, 0.09) 62% 63%, transparent 63%),
+    linear-gradient(115deg, transparent 0 66%, rgba(0, 240, 255, 0.07) 66% 66.6%, transparent 66.6%),
+    radial-gradient(50% 60% at 100% 0%, rgba(255, 42, 109, 0.22), transparent 70%),
+    radial-gradient(45% 55% at 0% 100%, rgba(0, 240, 255, 0.16), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 48px),
+    #050508;
+  --nx-bg-rail: rgba(0, 0, 0, 0.75);
+  --nx-bg-side: rgba(10, 10, 16, 0.78);
+  --nx-bg-chat: rgba(8, 8, 13, 0.7);
+  --nx-bg-elev: #0d0d14;
+  --nx-bg-elev-2: #14141d;
+  --nx-bg-input: rgba(0, 0, 0, 0.65);
+  --nx-hover: rgba(0, 240, 255, 0.06);
+  --nx-active: rgba(0, 240, 255, 0.1);
+  --nx-selected: rgba(245, 225, 0, 0.12);
+  --nx-line: rgba(0, 240, 255, 0.14);
+  --nx-line-strong: rgba(0, 240, 255, 0.32);
+  --nx-accent: #f5e100;
+  --nx-accent-2: #ff2a6d;
+  --nx-accent-3: #00f0ff;
+  --nx-accent-ink: #050508;
+  --nx-grad: linear-gradient(90deg, #f5e100, #f5e100);
+  --nx-glow: rgba(0, 240, 255, 0.8);
+  --nx-text: #e6f6f8;
+  --nx-text-2: #9fc4c9;
+  --nx-muted: #5f8a90;
+  --nx-faint: #2b3e42;
+  --nx-head: #ffffff;
+  --nx-link: #00f0ff;
+  --nx-mention-bg: rgba(245, 225, 0, 0.18);
+  --nx-mention-fg: #f5e100;
+  --nx-mention-row: rgba(255, 42, 109, 0.12);
+  --nx-radius: 2px;
+  --nx-radius-sm: 2px;
+  --nx-font-display: Bahnschrift, "DIN Alternate", "Segoe UI", sans-serif;
+  --nx-head-transform: uppercase;
+  --nx-head-spacing: 0.2em;
+  --nx-scroll: rgba(0, 240, 255, 0.5);
+  --nx-msg-hover: linear-gradient(90deg, rgba(0, 240, 255, 0.07), transparent 70%);
+}
+
+/* Köşesi kesik butonlar ve kutular */
+button[class*="lookFilled_"][class*="colorBrand_"],
+button[class*="brand_"][class*="button_"] {
+  font-family: var(--nx-font-display) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+form [class*="channelTextArea_"] {
+  border-left: 3px solid var(--nx-accent) !important;
+}
+
+/* Sunucu adı: neon başlık */
+[class*="sidebar_"] header h1,
+[class*="sidebar_"] header [class*="name_"] {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--nx-accent) !important;
+  text-shadow: 0 0 8px rgba(245, 225, 0, 0.55);
+}
+[class*="chat_"] > section[class*="title_"] h1,
+[class*="chat_"] > section[class*="title_"] h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+[class*="chat_"] > section[class*="title_"] {
+  border-bottom: 1px solid var(--nx-accent-3) !important;
+  box-shadow: 0 1px 12px -2px rgba(0, 240, 255, 0.45) !important;
+}
+
+/* Seçili kanal: sarı çubuk + koyu yazı yerine neon çerçeve */
+[class*="modeSelected_"] [class*="link_"],
+[class*="sidebar_"] [aria-current="page"] {
+  background: linear-gradient(90deg, rgba(245, 225, 0, 0.16), transparent 90%) !important;
+  box-shadow: inset 3px 0 0 var(--nx-accent) !important;
+}
+
+/* Kullanıcı adları */
+h3[class*="header_"] [class*="username_"] {
+  font-family: var(--nx-font-display) !important;
+  letter-spacing: 0.04em;
+}
+
+/* Menü vurgusu sarı */
+[class*="menu_"][role="menu"] [role="menuitem"]:hover,
+[class*="menu_"][role="menu"] [class*="focused_"] {
+  background: var(--nx-accent) !important;
+  color: #050508 !important;
+}
+[role="dialog"][class*="root_"],
+[class*="focusLock_"] > [role="dialog"],
+[class*="menu_"][role="menu"],
+[class*="popout_"] {
+  border-color: var(--nx-accent-3) !important;
+  box-shadow: 0 0 0 1px rgba(0, 240, 255, 0.25), 0 0 30px -6px rgba(0, 240, 255, 0.35) !important;
+}
+
+/* ---------- Efektler ---------- */
+/* CRT tarama çizgileri + yavaş tarayan ışık */
+html[data-nx-fx] body::after {
+  z-index: 2;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(0, 240, 255, 0.05) 50%, transparent 100%) 0 0 / 100% 220px no-repeat,
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
+  animation: nx-scan 7s linear infinite;
+}
+@keyframes nx-scan {
+  from { background-position: 0 -220px, 0 0; }
+  to   { background-position: 0 110vh, 0 0; }
+}
+html[data-nx-fx] [class*="sidebar_"] header h1,
+html[data-nx-fx] [class*="sidebar_"] header [class*="name_"] {
+  animation: nx-flicker 5s infinite;
+}
+@keyframes nx-flicker {
+  0%, 92%, 100% { opacity: 1; }
+  93% { opacity: 0.4; }
+  94% { opacity: 1; }
+  96% { opacity: 0.6; }
+  97% { opacity: 1; }
+}
+html[data-nx-fx] [data-list-item-id^="guildsnav___"]:hover img {
+  filter: drop-shadow(0 0 6px #00f0ff) drop-shadow(2px 0 0 rgba(255, 42, 109, 0.8));
+}

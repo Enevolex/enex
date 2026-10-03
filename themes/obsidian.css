@@ -1,0 +1,102 @@
+/* OBSİDYEN — siyah ve şampanya altını; sakin, lüks, en hafif tema */
+html:root {
+  --nx-void: #09090a;
+  --nx-backdrop:
+    radial-gradient(70% 50% at 50% -10%, rgba(212, 176, 106, 0.1), transparent 70%),
+    #09090a;
+  --nx-bg-rail: #070708;
+  --nx-bg-side: #0e0e10;
+  --nx-bg-chat: #121214;
+  --nx-bg-elev: #17171a;
+  --nx-bg-elev-2: #1d1d21;
+  --nx-bg-input: #18181b;
+  --nx-hover: rgba(236, 226, 205, 0.04);
+  --nx-active: rgba(236, 226, 205, 0.07);
+  --nx-selected: rgba(212, 176, 106, 0.1);
+  --nx-line: rgba(236, 226, 205, 0.06);
+  --nx-line-strong: rgba(212, 176, 106, 0.22);
+  --nx-accent: #d4b06a;
+  --nx-accent-2: #e8cf98;
+  --nx-accent-3: #9fc6a8;
+  --nx-accent-ink: #141210;
+  --nx-grad: linear-gradient(135deg, #e8cf98, #b8914a);
+  --nx-glow: rgba(212, 176, 106, 0.45);
+  --nx-text: #e9e4d8;
+  --nx-text-2: #b9b2a2;
+  --nx-muted: #847e71;
+  --nx-faint: #3d3a34;
+  --nx-head: #f6f1e6;
+  --nx-link: #e8cf98;
+  --nx-mention-bg: rgba(212, 176, 106, 0.16);
+  --nx-mention-fg: #f0dcae;
+  --nx-mention-row: rgba(212, 176, 106, 0.07);
+  --nx-radius: 10px;
+  --nx-radius-sm: 6px;
+  --nx-font-display: Georgia, "Palatino Linotype", "Times New Roman", serif;
+  --nx-head-transform: uppercase;
+  --nx-head-spacing: 0.18em;
+  --nx-scroll: rgba(212, 176, 106, 0.3);
+  --nx-msg-hover: rgba(236, 226, 205, 0.025);
+}
+
+/* Altın ince çizgiler */
+[class*="sidebar_"] header {
+  border-bottom: 1px solid var(--nx-line-strong) !important;
+  box-shadow: none !important;
+}
+[class*="sidebar_"] header h1,
+[class*="sidebar_"] header [class*="name_"] {
+  font-weight: 400 !important;
+  letter-spacing: 0.04em;
+  font-size: 17px !important;
+  color: var(--nx-head) !important;
+}
+[class*="chat_"] > section[class*="title_"] h1,
+[class*="chat_"] > section[class*="title_"] h2 {
+  font-weight: 400 !important;
+  letter-spacing: 0.03em;
+}
+[class*="containerDefault_"] h3,
+[class*="membersGroup_"] {
+  font-size: 10px !important;
+  font-weight: 400 !important;
+}
+
+/* Seçili kanal: sadece altın sol çizgi, gradyan yok */
+[class*="modeSelected_"] [class*="link_"],
+[class*="sidebar_"] [aria-current="page"] {
+  background: var(--nx-selected) !important;
+  box-shadow: inset 2px 0 0 var(--nx-accent) !important;
+}
+li[id^="chat-messages-"] > div:hover {
+  box-shadow: none !important;
+}
+h3[class*="header_"] [class*="username_"] {
+  letter-spacing: 0.01em;
+}
+
+/* Butonlar: altın metalik */
+button[class*="lookFilled_"][class*="colorBrand_"],
+button[class*="brand_"][class*="button_"] {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 4px 14px -6px rgba(212, 176, 106, 0.6) !important;
+  font-weight: 600 !important;
+}
+[class*="menu_"][role="menu"] [role="menuitem"]:hover,
+[class*="menu_"][role="menu"] [class*="focused_"] {
+  background: rgba(212, 176, 106, 0.16) !important;
+  color: var(--nx-head) !important;
+}
+
+/* ---------- Efektler: çok hafif — altın çizgide yavaş parıltı ---------- */
+html[data-nx-fx] [class*="sidebar_"] header {
+  border-image: linear-gradient(90deg, transparent, #d4b06a 30%, #fff4d6 50%, #d4b06a 70%, transparent) 1 !important;
+  border-image-width: 0 0 1px 0 !important;
+}
+html[data-nx-fx] body::after {
+  background: linear-gradient(110deg, transparent 40%, rgba(232, 207, 152, 0.035) 50%, transparent 60%) 0 0 / 300% 100%;
+  animation: nx-sheen 14s ease-in-out infinite;
+}
+@keyframes nx-sheen {
+  from { background-position: 150% 0; }
+  to   { background-position: -50% 0; }
+}

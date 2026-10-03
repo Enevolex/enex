@@ -1,0 +1,96 @@
+/* AURORA — derin uzayda mor-pembe-camgöbeği kuzey ışıkları */
+html:root {
+  --nx-void: #07060f;
+  --nx-backdrop:
+    radial-gradient(38% 42% at 12% 8%, rgba(139, 92, 246, 0.45), transparent 70%),
+    radial-gradient(34% 40% at 88% 18%, rgba(236, 72, 153, 0.28), transparent 72%),
+    radial-gradient(42% 46% at 70% 96%, rgba(34, 211, 238, 0.24), transparent 70%),
+    radial-gradient(30% 30% at 30% 70%, rgba(99, 102, 241, 0.2), transparent 70%),
+    #07060f;
+  --nx-bg-rail: rgba(5, 4, 12, 0.55);
+  --nx-bg-side: rgba(10, 8, 22, 0.5);
+  --nx-bg-chat: rgba(12, 10, 26, 0.42);
+  --nx-bg-elev: rgba(16, 13, 34, 0.97);
+  --nx-bg-elev-2: rgba(24, 20, 48, 0.98);
+  --nx-bg-input: rgba(20, 17, 42, 0.7);
+  --nx-hover: rgba(167, 139, 250, 0.08);
+  --nx-active: rgba(167, 139, 250, 0.14);
+  --nx-selected: rgba(139, 92, 246, 0.3);
+  --nx-line: rgba(167, 139, 250, 0.13);
+  --nx-line-strong: rgba(167, 139, 250, 0.24);
+  --nx-accent: #a78bfa;
+  --nx-accent-2: #ec4899;
+  --nx-accent-3: #22d3ee;
+  --nx-accent-ink: #ffffff;
+  --nx-grad: linear-gradient(120deg, #8b5cf6 0%, #ec4899 55%, #22d3ee 100%);
+  --nx-glow: rgba(139, 92, 246, 0.75);
+  --nx-text: #e4e1fb;
+  --nx-text-2: #b3aedb;
+  --nx-muted: #8f89bb;
+  --nx-faint: #4a4570;
+  --nx-head: #ffffff;
+  --nx-link: #67e8f9;
+  --nx-mention-bg: rgba(139, 92, 246, 0.28);
+  --nx-mention-fg: #ddd6fe;
+  --nx-mention-row: rgba(236, 72, 153, 0.13);
+  --nx-radius: 14px;
+  --nx-radius-sm: 9px;
+  --nx-scroll: rgba(139, 92, 246, 0.55);
+  --nx-msg-hover: linear-gradient(90deg, rgba(139, 92, 246, 0.1), transparent 75%);
+}
+
+[class*="sidebar_"] header h1,
+[class*="sidebar_"] header [class*="name_"] {
+  background: linear-gradient(90deg, #fff, #c4b5fd 50%, #67e8f9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+}
+[class*="modeSelected_"] [class*="name_"] { text-shadow: 0 0 12px rgba(167, 139, 250, 0.6); }
+
+/* ---------- Efektler ---------- */
+html[data-nx-fx] body::before {
+  animation: nx-aurora 28s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes nx-aurora {
+  0%   { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+  50%  { transform: translate3d(4%, -3%, 0) scale(1.08) rotate(4deg); }
+  100% { transform: translate3d(-3%, 4%, 0) scale(1.04) rotate(-3deg); }
+}
+html[data-nx-fx] body::after {
+  opacity: 0.55;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+    radial-gradient(1px 1px at 140px 80px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1.5px 1.5px at 260px 160px, #c4b5fd, transparent),
+    radial-gradient(1px 1px at 330px 40px, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1.5px 1.5px at 80px 220px, #67e8f9, transparent),
+    radial-gradient(1px 1px at 200px 270px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 380px 210px, #f9a8d4, transparent);
+  background-size: 400px 300px;
+  animation: nx-twinkle 6s ease-in-out infinite alternate;
+}
+@keyframes nx-twinkle { from { opacity: 0.3; } to { opacity: 0.7; } }
+
+html[data-nx-fx] nav[class*="guilds_"],
+html[data-nx-fx] [class^="sidebar_"],
+html[data-nx-fx] [class^="members_"],
+html[data-nx-fx] section[class*="panels_"],
+html[data-nx-fx] form [class*="channelTextArea_"],
+html[data-nx-fx] [class*="menu_"][role="menu"],
+html[data-nx-fx] [class*="popout_"] {
+  backdrop-filter: blur(18px) saturate(140%);
+}
+html[data-nx-fx] form [class*="channelTextArea_"]:focus-within {
+  border-color: transparent !important;
+  background:
+    linear-gradient(rgba(16, 13, 34, 0.92), rgba(16, 13, 34, 0.92)) padding-box,
+    linear-gradient(120deg, #8b5cf6, #ec4899, #22d3ee, #8b5cf6) border-box !important;
+  background-size: 100% 100%, 300% 100% !important;
+  animation: nx-border 4s linear infinite;
+}
+@keyframes nx-border {
+  from { background-position: 0 0, 0% 0; }
+  to   { background-position: 0 0, 300% 0; }
+}

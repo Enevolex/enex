@@ -1,0 +1,109 @@
+/* SYNTHWAVE — 80'ler: mor gece, turuncu güneş, ufka akan neon ızgara */
+html:root {
+  --nx-void: #10021f;
+  --nx-backdrop:
+    radial-gradient(circle at 50% 74%, #ffd36b 0 7%, #ff8a4c 9.5%, #ff3cac 13%, transparent 13.2%),
+    radial-gradient(60% 40% at 50% 75%, rgba(255, 60, 172, 0.45), transparent 70%),
+    linear-gradient(180deg, #0c0120 0%, #1e0540 45%, #3a0a52 72%, #12011f 72.2%, #12011f 100%);
+  --nx-bg-rail: rgba(12, 1, 24, 0.8);
+  --nx-bg-side: rgba(22, 4, 44, 0.8);
+  --nx-bg-chat: rgba(18, 3, 36, 0.8);
+  --nx-bg-elev: rgba(28, 6, 54, 0.98);
+  --nx-bg-elev-2: rgba(38, 9, 70, 0.98);
+  --nx-bg-input: rgba(36, 8, 66, 0.72);
+  --nx-hover: rgba(255, 60, 172, 0.08);
+  --nx-active: rgba(255, 60, 172, 0.14);
+  --nx-selected: rgba(255, 60, 172, 0.22);
+  --nx-line: rgba(255, 60, 172, 0.16);
+  --nx-line-strong: rgba(45, 226, 230, 0.35);
+  --nx-accent: #ff3cac;
+  --nx-accent-2: #ffb547;
+  --nx-accent-3: #2de2e6;
+  --nx-accent-ink: #ffffff;
+  --nx-grad: linear-gradient(90deg, #ff3cac, #ff8a4c, #ffb547);
+  --nx-glow: rgba(255, 60, 172, 0.8);
+  --nx-text: #fbe8ff;
+  --nx-text-2: #d5b3e6;
+  --nx-muted: #a07fb8;
+  --nx-faint: #5a3a74;
+  --nx-head: #ffffff;
+  --nx-link: #2de2e6;
+  --nx-mention-bg: rgba(255, 181, 71, 0.2);
+  --nx-mention-fg: #ffd59a;
+  --nx-mention-row: rgba(255, 181, 71, 0.1);
+  --nx-radius: 12px;
+  --nx-radius-sm: 8px;
+  --nx-font-display: "Segoe UI Black", "Arial Black", "Segoe UI", sans-serif;
+  --nx-head-transform: uppercase;
+  --nx-head-spacing: 0.14em;
+  --nx-scroll: linear-gradient(#ff3cac, #2de2e6);
+  --nx-msg-hover: linear-gradient(90deg, rgba(255, 60, 172, 0.1), transparent 70%);
+}
+
+::-webkit-scrollbar-thumb { background-image: linear-gradient(#ff3cac, #2de2e6) !important; }
+
+/* Ufuk ızgarası (statik) */
+body::after {
+  top: 72%;
+  background:
+    linear-gradient(180deg, #12011f 0%, transparent 30%),
+    repeating-linear-gradient(90deg, rgba(255, 60, 172, 0.55) 0 2px, transparent 2px 80px),
+    repeating-linear-gradient(0deg, rgba(255, 60, 172, 0.55) 0 2px, transparent 2px 40px);
+  transform: perspective(300px) rotateX(60deg);
+  transform-origin: 50% 0%;
+  opacity: 0.55;
+  inset: 72% -50% -40% -50%;
+}
+
+[class*="sidebar_"] header h1,
+[class*="sidebar_"] header [class*="name_"] {
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: linear-gradient(180deg, #ffffff 0%, #ffd36b 45%, #ff3cac 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  filter: drop-shadow(0 0 6px rgba(255, 60, 172, 0.6));
+}
+[class*="containerDefault_"] h3,
+[class*="membersGroup_"] {
+  color: var(--nx-accent-3) !important;
+  text-shadow: 0 0 8px rgba(45, 226, 230, 0.6);
+}
+[class*="modeSelected_"] [class*="link_"],
+[class*="sidebar_"] [aria-current="page"] {
+  background: linear-gradient(90deg, rgba(255, 60, 172, 0.35), rgba(255, 181, 71, 0.08) 80%, transparent) !important;
+  box-shadow: inset 3px 0 0 #ffb547 !important;
+}
+[class*="chat_"] > section[class*="title_"] {
+  border-bottom: 2px solid transparent !important;
+  border-image: linear-gradient(90deg, #ff3cac, #ffb547, #2de2e6) 1 !important;
+}
+form [class*="channelTextArea_"] {
+  border-color: rgba(45, 226, 230, 0.45) !important;
+  box-shadow: 0 0 18px -6px rgba(45, 226, 230, 0.6);
+}
+
+/* ---------- Efektler ---------- */
+html[data-nx-fx] body::after {
+  animation: nx-grid 1.6s linear infinite;
+}
+@keyframes nx-grid {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 0 0, 0 0, 0 40px; }
+}
+html[data-nx-fx] body::before {
+  animation: nx-sun 6s ease-in-out infinite alternate;
+}
+@keyframes nx-sun {
+  from { filter: brightness(1) saturate(1); }
+  to   { filter: brightness(1.15) saturate(1.2); }
+}
+html[data-nx-fx] nav[class*="guilds_"],
+html[data-nx-fx] [class^="sidebar_"],
+html[data-nx-fx] [class^="members_"],
+html[data-nx-fx] [class*="menu_"][role="menu"],
+html[data-nx-fx] [class*="popout_"] {
+  backdrop-filter: blur(14px);
+}

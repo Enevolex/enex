@@ -1,0 +1,166 @@
+/* =====================================================================
+   NEXUS HAREKET KATMANI — tüm temalarda, "Efektler" açıkken.
+   Sadece transform ve opacity canlandırılır: ekran kartı bunları ucuza,
+   takılmadan çizer.
+   ===================================================================== */
+
+:root {
+  --nx-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --nx-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---------- Mesajlar kayarak gelir ---------- */
+html[data-nx-fx] li[id^="chat-messages-"] {
+  animation: nx-msg-in 0.45s var(--nx-ease-out) backwards;
+}
+@keyframes nx-msg-in {
+  from { opacity: 0; transform: translate3d(0, 12px, 0) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Kanal değişince sohbet yumuşakça belirir */
+html[data-nx-fx] main[class*="chatContent_"] {
+  animation: nx-fade-up 0.4s var(--nx-ease-out) backwards;
+}
+@keyframes nx-fade-up {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Kanal listesi: sırayla kayarak dolar ---------- */
+html[data-nx-fx] [class*="containerDefault_"] {
+  animation: nx-slide-right 0.4s var(--nx-ease-out) backwards;
+}
+html[data-nx-fx] [class*="containerDefault_"]:nth-child(1)  { animation-delay: 0.00s; }
+html[data-nx-fx] [class*="containerDefault_"]:nth-child(2)  { animation-delay: 0.02s; }
+html[data-nx-fx] [class*="containerDefault_"]:nth-child(3)  { animation-delay: 0.04s; }
+html[data-nx-fx] [class*="containerDefault_"]:nth-child(4)  { animation-delay: 0.06s; }
+html[data-nx-fx] [class*="containerDefault_"]:nth-child(5)  { animation-delay: 0.08s; }
+html[data-nx-fx] [class*="containerDefault_"]:nth-child(6)  { animation-delay: 0.10s; }
+html[data-nx-fx] [class*="containerDefault_"]:nth-child(7)  { animation-delay: 0.12s; }
+html[data-nx-fx] [class*="containerDefault_"]:nth-child(8)  { animation-delay: 0.14s; }
+html[data-nx-fx] [class*="containerDefault_"]:nth-child(9)  { animation-delay: 0.16s; }
+html[data-nx-fx] [class*="containerDefault_"]:nth-child(10) { animation-delay: 0.18s; }
+html[data-nx-fx] [class*="containerDefault_"]:nth-child(n+11) { animation-delay: 0.20s; }
+@keyframes nx-slide-right {
+  from { opacity: 0; transform: translate3d(-10px, 0, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+html[data-nx-fx] [class*="sidebar_"] a[class*="link_"] {
+  transition: transform 0.3s var(--nx-spring), background 0.2s ease, box-shadow 0.2s ease !important;
+}
+html[data-nx-fx] [class*="sidebar_"] a[class*="link_"]:hover {
+  transform: translate3d(4px, 0, 0);
+}
+
+/* ---------- Üye listesi: sağdan sırayla ---------- */
+html[data-nx-fx] [class*="members_"] [class*="member_"] {
+  animation: nx-slide-left 0.45s var(--nx-ease-out) backwards;
+  transition: transform 0.3s var(--nx-spring), background 0.2s ease !important;
+}
+html[data-nx-fx] [class*="members_"] [class*="member_"]:nth-child(2) { animation-delay: 0.03s; }
+html[data-nx-fx] [class*="members_"] [class*="member_"]:nth-child(3) { animation-delay: 0.06s; }
+html[data-nx-fx] [class*="members_"] [class*="member_"]:nth-child(4) { animation-delay: 0.09s; }
+html[data-nx-fx] [class*="members_"] [class*="member_"]:nth-child(5) { animation-delay: 0.12s; }
+html[data-nx-fx] [class*="members_"] [class*="member_"]:nth-child(n+6) { animation-delay: 0.15s; }
+html[data-nx-fx] [class*="members_"] [class*="member_"]:hover {
+  transform: translate3d(-3px, 0, 0);
+}
+@keyframes nx-slide-left {
+  from { opacity: 0; transform: translate3d(12px, 0, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Sunucu ikonları: yaylanarak büyür ---------- */
+html[data-nx-fx] [data-list-item-id^="guildsnav___"] img,
+html[data-nx-fx] [data-list-item-id^="guildsnav___"] svg {
+  transition: transform 0.35s var(--nx-spring), filter 0.25s ease !important;
+}
+html[data-nx-fx] [data-list-item-id^="guildsnav___"]:hover img,
+html[data-nx-fx] [data-list-item-id^="guildsnav___"]:hover svg {
+  transform: translate3d(0, -2px, 0) scale(1.08);
+}
+html[data-nx-fx] [data-list-item-id^="guildsnav___"]:active img,
+html[data-nx-fx] [data-list-item-id^="guildsnav___"]:active svg {
+  transform: scale(0.94);
+  transition-duration: 0.1s !important;
+}
+
+/* ---------- Butonlar: yükselme yok (metin titremesin), sadece hafif gölge ---------- */
+html[data-nx-fx] button[class*="lookFilled_"][class*="colorBrand_"]:hover:not(:disabled),
+html[data-nx-fx] button[class*="brand_"][class*="button_"]:hover:not(:disabled) {
+  box-shadow: 0 6px 18px -8px var(--nx-glow) !important;
+}
+
+/* Tepkiler: sadece üzerine gelince hafif büyür (her güncellemede zıplamasın) */
+html[data-nx-fx] [class*="reaction_"] {
+  transition: transform 0.25s var(--nx-spring) !important;
+}
+html[data-nx-fx] [class*="reaction_"]:hover { transform: scale(1.06); }
+
+/* ---------- Menüler, açılır kutular, pencereler ---------- */
+html[data-nx-fx] [class*="menu_"][role="menu"],
+html[data-nx-fx] [class*="popout_"],
+html[data-nx-fx] [class*="userPopout"] {
+  animation: nx-pop-in 0.24s var(--nx-ease-out) backwards;
+  transform-origin: top center;
+}
+html[data-nx-fx] [class*="focusLock_"] > [role="dialog"],
+html[data-nx-fx] [role="dialog"][class*="root_"] {
+  animation: nx-dialog-in 0.36s var(--nx-ease-out) backwards;
+}
+html[data-nx-fx] [class*="backdrop_"] {
+  animation: nx-fade 0.3s ease backwards;
+}
+html[data-nx-fx] [class*="tooltip_"] {
+  animation: nx-pop-in 0.18s var(--nx-ease-out) backwards;
+}
+@keyframes nx-pop-in {
+  from { opacity: 0; transform: translate3d(0, 4px, 0) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes nx-dialog-in {
+  from { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.95); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes nx-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- Mesaj kutusu odaklanınca hafif yükselir ---------- */
+html[data-nx-fx] form [class*="channelTextArea_"] {
+  transition: transform 0.3s var(--nx-spring), border-color 0.2s ease, box-shadow 0.3s ease !important;
+}
+html[data-nx-fx] form [class*="channelTextArea_"]:focus-within {
+  transform: translate3d(0, -2px, 0);
+}
+
+/* ---------- Konuşan kişinin halkası nabız gibi atar ---------- */
+html[data-nx-fx] [class*="avatarSpeaking_"],
+html[data-nx-fx] [class*="speaking_"] [class*="avatar_"] {
+  animation: nx-speak 1.4s ease-in-out infinite;
+}
+@keyframes nx-speak {
+  0%, 100% { box-shadow: 0 0 0 2px var(--nx-accent-3), 0 0 6px var(--nx-accent-3); }
+  50%      { box-shadow: 0 0 0 2px var(--nx-accent-3), 0 0 18px var(--nx-accent-3); }
+}
+
+/* ---------- Başlık çubuğundaki gradyan çizgi akar ---------- */
+html[data-nx-fx] [class^="base_"] > [class^="bar_"]::after {
+  animation: nx-bar-flow 8s linear infinite;
+}
+@keyframes nx-bar-flow {
+  from { background-position: 0% 0; }
+  to   { background-position: 200% 0; }
+}
+
+/* Avatarlar üzerine gelince hafif döner */
+html[data-nx-fx] li[id^="chat-messages-"] img[class*="avatar_"] {
+  transition: transform 0.35s var(--nx-spring);
+}
+html[data-nx-fx] li[id^="chat-messages-"] > div:hover img[class*="avatar_"] {
+  transform: rotate(-6deg) scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-nx-fx] * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

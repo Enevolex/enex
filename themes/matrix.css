@@ -1,0 +1,85 @@
+/* MATRIX — siyah ekran, fosforlu yeşil, her şey terminal yazısıyla */
+html:root {
+  --nx-void: #000000;
+  --nx-backdrop:
+    radial-gradient(80% 60% at 50% 50%, rgba(0, 255, 102, 0.06), transparent 70%),
+    #000;
+  --nx-bg-rail: rgba(0, 0, 0, 0.85);
+  --nx-bg-side: rgba(0, 10, 4, 0.82);
+  --nx-bg-chat: rgba(0, 6, 2, 0.78);
+  --nx-bg-elev: #010d05;
+  --nx-bg-elev-2: #021508;
+  --nx-bg-input: rgba(0, 20, 8, 0.8);
+  --nx-hover: rgba(0, 255, 102, 0.06);
+  --nx-active: rgba(0, 255, 102, 0.1);
+  --nx-selected: rgba(0, 255, 102, 0.14);
+  --nx-line: rgba(0, 255, 102, 0.14);
+  --nx-line-strong: rgba(0, 255, 102, 0.34);
+  --nx-accent: #00ff66;
+  --nx-accent-2: #b6ff00;
+  --nx-accent-3: #00ff66;
+  --nx-accent-ink: #000000;
+  --nx-grad: linear-gradient(90deg, #00ff66, #00cc52);
+  --nx-glow: rgba(0, 255, 102, 0.8);
+  --nx-text: #b8ffcf;
+  --nx-text-2: #6fdc94;
+  --nx-muted: #3f9d5e;
+  --nx-faint: #1d4a2c;
+  --nx-head: #d9ffe5;
+  --nx-link: #b6ff00;
+  --nx-mention-bg: rgba(182, 255, 0, 0.16);
+  --nx-mention-fg: #d8ff7a;
+  --nx-mention-row: rgba(182, 255, 0, 0.07);
+  --nx-radius: 0px;
+  --nx-radius-sm: 0px;
+  --nx-font-body: "Cascadia Mono", Consolas, "Courier New", monospace;
+  --nx-font-display: "Cascadia Mono", Consolas, "Courier New", monospace;
+  --nx-font-code: "Cascadia Mono", Consolas, monospace;
+  --nx-head-transform: uppercase;
+  --nx-head-spacing: 0.12em;
+  --nx-scroll: rgba(0, 255, 102, 0.45);
+  --nx-msg-hover: rgba(0, 255, 102, 0.05);
+}
+
+html[data-nx-fx] [class*="sidebar_"] header,
+html[data-nx-fx] [class*="chat_"] > section[class*="title_"],
+html[data-nx-fx] h3[class*="header_"] { text-shadow: 0 0 8px rgba(0, 255, 102, 0.55); }
+
+[class*="sidebar_"] header h1::before,
+[class*="sidebar_"] header [class*="name_"]::before { content: "> "; color: var(--nx-accent); }
+[class*="sidebar_"] header h1,
+[class*="sidebar_"] header [class*="name_"] { color: var(--nx-accent) !important; }
+[class*="modeSelected_"] [class*="link_"],
+[class*="sidebar_"] [aria-current="page"] {
+  background: var(--nx-accent) !important;
+  box-shadow: none !important;
+}
+[class*="modeSelected_"] [class*="link_"] *,
+[class*="sidebar_"] [aria-current="page"] * {
+  color: #000 !important;
+  text-shadow: none !important;
+}
+form [class*="channelTextArea_"] { border-style: dashed !important; }
+li[id^="chat-messages-"] > div:hover { box-shadow: inset 2px 0 0 var(--nx-accent); }
+
+/* ---------- Efektler: düşen kod yağmuru (CSS ile yaklaşık) ---------- */
+html[data-nx-fx] body::after {
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(0, 255, 102, 0.12) 60%, rgba(180, 255, 200, 0.4) 62%, transparent 62.5%) 0 0 / 23px 340px,
+    linear-gradient(180deg, transparent 0%, rgba(0, 255, 102, 0.1) 70%, rgba(180, 255, 200, 0.35) 72%, transparent 72.5%) 11px 0 / 37px 520px,
+    linear-gradient(180deg, transparent 0%, rgba(0, 255, 102, 0.08) 50%, rgba(180, 255, 200, 0.3) 52%, transparent 52.5%) 5px 0 / 53px 260px;
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 2px, transparent 2px 4px);
+  opacity: 0.6;
+  animation: nx-rain 9s linear infinite;
+}
+@keyframes nx-rain {
+  from { background-position: 0 0, 11px 0, 5px 0; }
+  to   { background-position: 0 1020px, 11px 1040px, 5px 1040px; }
+}
+html[data-nx-fx] [class*="sidebar_"] header h1::after,
+html[data-nx-fx] [class*="sidebar_"] header [class*="name_"]::after {
+  content: "█";
+  margin-left: 4px;
+  animation: nx-caret 1s steps(1) infinite;
+}
+@keyframes nx-caret { 50% { opacity: 0; } }

@@ -1,0 +1,525 @@
+/* =====================================================================
+   NEXUS ÇEKİRDEK — tüm temaların ortak iskeleti
+   Temalar yalnızca --nx-* değişkenlerini tanımlar; bu dosya onları
+   Discord'un kendi değişkenlerine ve bileşenlerine bağlar.
+   ===================================================================== */
+
+/* ---------- Varsayılan palet (temalar bunu ezer) ---------- */
+:root {
+  --nx-void: #0b0b10;
+  --nx-backdrop: var(--nx-void);
+  --nx-bg-rail: rgba(0, 0, 0, 0.35);
+  --nx-bg-side: rgba(255, 255, 255, 0.02);
+  --nx-bg-chat: rgba(255, 255, 255, 0.03);
+  --nx-bg-elev: #15151d;
+  --nx-bg-elev-2: #1b1b25;
+  --nx-bg-input: rgba(255, 255, 255, 0.05);
+  --nx-hover: rgba(255, 255, 255, 0.05);
+  --nx-active: rgba(255, 255, 255, 0.08);
+  --nx-selected: rgba(255, 255, 255, 0.1);
+  --nx-line: rgba(255, 255, 255, 0.07);
+  --nx-line-strong: rgba(255, 255, 255, 0.14);
+  --nx-accent: #8b5cf6;
+  --nx-accent-2: #ec4899;
+  --nx-accent-3: #22d3ee;
+  --nx-accent-ink: #ffffff;
+  --nx-grad: linear-gradient(120deg, var(--nx-accent), var(--nx-accent-2));
+  --nx-glow: rgba(139, 92, 246, 0.5);
+  --nx-text: #e7e6ef;
+  --nx-text-2: #b5b3c6;
+  --nx-muted: #8a889c;
+  --nx-faint: #4a4858;
+  --nx-head: #ffffff;
+  --nx-link: #67e8f9;
+  --nx-mention-bg: rgba(139, 92, 246, 0.22);
+  --nx-mention-fg: #ddd6fe;
+  --nx-mention-row: rgba(236, 72, 153, 0.1);
+  --nx-radius: 12px;
+  --nx-radius-sm: 8px;
+  --nx-font-body: "gg sans", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+  --nx-font-display: "gg sans", "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  --nx-font-code: "Cascadia Mono", Consolas, monospace;
+  --nx-head-transform: none;
+  --nx-head-spacing: 0.06em;
+  --nx-scroll: var(--nx-accent);
+  --nx-msg-hover: linear-gradient(90deg, var(--nx-hover), transparent 80%);
+}
+
+/* ---------- Discord değişkenlerini Nexus paletine bağla ---------- */
+:root,
+html.theme-dark, html.theme-darker, html.theme-midnight,
+html .theme-dark, html .theme-darker, html .theme-midnight,
+html .visual-refresh {
+  /* Eski değişkenler */
+  --background-primary: var(--nx-bg-chat) !important;
+  --background-secondary: var(--nx-bg-side) !important;
+  --background-secondary-alt: var(--nx-bg-elev) !important;
+  --background-tertiary: var(--nx-bg-rail) !important;
+  --background-floating: var(--nx-bg-elev) !important;
+  --background-nested-floating: var(--nx-bg-elev-2) !important;
+  --background-accent: var(--nx-accent) !important;
+  --background-modifier-hover: var(--nx-hover) !important;
+  --background-modifier-active: var(--nx-active) !important;
+  --background-modifier-selected: var(--nx-selected) !important;
+  --background-modifier-accent: var(--nx-line) !important;
+  --background-message-hover: var(--nx-hover) !important;
+  --channeltextarea-background: var(--nx-bg-input) !important;
+  --modal-background: var(--nx-bg-elev) !important;
+  --modal-footer-background: var(--nx-bg-elev-2) !important;
+  --deprecated-card-bg: var(--nx-bg-elev) !important;
+  --input-background: var(--nx-bg-input) !important;
+
+  /* 2025 görsel yenileme değişkenleri */
+  --background-base-lowest: var(--nx-bg-rail) !important;
+  --background-base-lower: var(--nx-bg-side) !important;
+  --background-base-low: var(--nx-bg-chat) !important;
+  --background-surface-high: var(--nx-bg-elev) !important;
+  --background-surface-higher: var(--nx-bg-elev-2) !important;
+  --background-surface-highest: var(--nx-bg-elev-2) !important;
+  --background-mod-subtle: var(--nx-hover) !important;
+  --background-mod-normal: var(--nx-active) !important;
+  --background-mod-strong: var(--nx-selected) !important;
+  --chat-background-default: transparent !important;
+  --app-frame-background: transparent !important;
+  --app-frame-border: var(--nx-line) !important;
+  --border-subtle: var(--nx-line) !important;
+  --border-faint: var(--nx-line) !important;
+  --border-normal: var(--nx-line-strong) !important;
+  --border-strong: var(--nx-line-strong) !important;
+
+  /* Vurgu */
+  --brand-500: var(--nx-accent) !important;
+  --brand-560: var(--nx-accent) !important;
+  --brand-600: var(--nx-accent) !important;
+  --brand-experiment: var(--nx-accent) !important;
+  --brand-experiment-560: var(--nx-accent) !important;
+  --brand-experiment-600: var(--nx-accent) !important;
+  --control-brand-foreground: var(--nx-accent) !important;
+  --control-brand-foreground-new: var(--nx-accent) !important;
+  --text-brand: var(--nx-accent) !important;
+  --text-link: var(--nx-link) !important;
+  --mention-background: var(--nx-mention-bg) !important;
+  --mention-foreground: var(--nx-mention-fg) !important;
+  --info-help-foreground: var(--nx-accent-3) !important;
+
+  /* Yazı */
+  --text-normal: var(--nx-text) !important;
+  --text-default: var(--nx-text) !important;
+  --text-secondary: var(--nx-text-2) !important;
+  --text-muted: var(--nx-muted) !important;
+  --text-strong: var(--nx-head) !important;
+  --header-primary: var(--nx-head) !important;
+  --header-secondary: var(--nx-text-2) !important;
+  --interactive-normal: var(--nx-text-2) !important;
+  --interactive-hover: var(--nx-head) !important;
+  --interactive-active: var(--nx-head) !important;
+  --interactive-muted: var(--nx-faint) !important;
+  --channels-default: var(--nx-muted) !important;
+  --channel-icon: var(--nx-muted) !important;
+
+  /* Yazı tipleri */
+  --font-primary: var(--nx-font-body) !important;
+  --font-display: var(--nx-font-display) !important;
+  --font-headline: var(--nx-font-display) !important;
+  --font-code: var(--nx-font-code) !important;
+
+  /* Kaydırma çubukları */
+  --scrollbar-thin-thumb: var(--nx-scroll) !important;
+  --scrollbar-thin-track: transparent !important;
+  --scrollbar-auto-thumb: var(--nx-scroll) !important;
+  --scrollbar-auto-track: transparent !important;
+  --scrollbar-auto-scrollbar-color-thumb: var(--nx-scroll) !important;
+  --scrollbar-auto-scrollbar-color-track: transparent !important;
+}
+
+/* ---------- Pencere arka planı ---------- */
+html { background: var(--nx-void) !important; }
+body { background: transparent !important; }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -12%;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--nx-backdrop);
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+#app-mount {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+}
+
+#app-mount [class^="bg_"], #app-mount [class*=" bg_"],
+#app-mount [class^="app_"], #app-mount [class*=" app_"],
+#app-mount [class*="appMount_"],
+#app-mount [class*="layers_"],
+#app-mount [class^="layer_"], #app-mount [class*=" layer_"] {
+  background: transparent !important;
+}
+
+/* ---------- Genel ---------- */
+::selection { background: var(--nx-accent); color: var(--nx-accent-ink); }
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--nx-scroll) !important;
+  border-radius: 999px !important;
+  border: 3px solid transparent !important;
+  background-clip: padding-box !important;
+  opacity: 0.6;
+}
+::-webkit-scrollbar-track { background: transparent !important; border: none !important; }
+
+/* ---------- Sunucu şeridi ---------- */
+[data-list-item-id^="guildsnav___"] img,
+[data-list-item-id^="guildsnav___"] svg {
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+[data-list-item-id^="guildsnav___"]:hover img,
+[data-list-item-id^="guildsnav___"]:hover svg {
+  filter: drop-shadow(0 0 8px var(--nx-glow));
+}
+[class*="guilds_"] [class*="pill_"] span {
+  background: var(--nx-grad) !important;
+}
+
+/* ---------- Kanal listesi ---------- */
+[class*="sidebar_"] a[class*="link_"] {
+  border-radius: var(--nx-radius-sm) !important;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+[class*="modeSelected_"] [class*="link_"],
+[class*="sidebar_"] [aria-current="page"] {
+  background: linear-gradient(90deg, var(--nx-selected), transparent 95%) !important;
+  box-shadow: inset 2px 0 0 var(--nx-accent);
+}
+[class*="modeSelected_"] [class*="name_"],
+[class*="sidebar_"] [aria-current="page"] [class*="name_"] {
+  color: var(--nx-head) !important;
+}
+[class*="containerDefault_"] h3,
+[class*="mainContent_"] h3[class*="name_"],
+[class*="membersGroup_"] {
+  font-family: var(--nx-font-display) !important;
+  text-transform: var(--nx-head-transform) !important;
+  letter-spacing: var(--nx-head-spacing) !important;
+  color: var(--nx-accent) !important;
+  opacity: 0.85;
+}
+[class*="sidebar_"] header h1,
+[class*="sidebar_"] header [class*="name_"] {
+  font-family: var(--nx-font-display) !important;
+}
+
+/* ---------- Mesajlar ---------- */
+li[id^="chat-messages-"] > div {
+  border-radius: var(--nx-radius-sm);
+  transition: background 0.12s ease, box-shadow 0.12s ease;
+}
+li[id^="chat-messages-"] > div:hover {
+  background: var(--nx-msg-hover) !important;
+  box-shadow: inset 2px 0 0 var(--nx-accent);
+}
+li[id^="chat-messages-"] [class*="mentioned_"] {
+  background: linear-gradient(90deg, var(--nx-mention-row), transparent 85%) !important;
+  box-shadow: inset 2px 0 0 var(--nx-accent-2) !important;
+}
+span[class*="mention"] { border-radius: 6px !important; }
+pre code, code[class*="inline"] {
+  background: var(--nx-bg-rail) !important;
+  border: 1px solid var(--nx-line) !important;
+  border-radius: var(--nx-radius-sm) !important;
+  font-family: var(--nx-font-code) !important;
+}
+[class*="divider_"][class*="hasContent_"] span,
+[class*="divider_"] [class*="content_"] {
+  font-family: var(--nx-font-display) !important;
+  color: var(--nx-muted) !important;
+}
+
+/* ---------- Mesaj kutusu ---------- */
+form [class*="channelTextArea_"] {
+  border-radius: var(--nx-radius) !important;
+  border: 1px solid var(--nx-line-strong) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+form [class*="channelTextArea_"]:focus-within {
+  border-color: var(--nx-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--nx-accent) 22%, transparent);
+}
+
+/* ---------- Butonlar ----------
+   Sadece Discord'un dolgulu "ana" butonları boyanır. Şekil ve boyut Discord'da kalır;
+   böylece ikon butonları ve bitişik buton grupları bozulmaz. */
+button[class*="lookFilled_"][class*="colorBrand_"],
+button[class*="button_"][class*="primary_"]:not([class*="icon"]),
+button[class*="brand_"][class*="button_"] {
+  background: var(--nx-grad) !important;
+  background-size: 100% 100% !important;
+  color: var(--nx-accent-ink) !important;
+  border-color: transparent !important;
+  text-shadow: none !important;
+  transition: filter 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease !important;
+}
+button[class*="lookFilled_"][class*="colorBrand_"]:hover:not(:disabled),
+button[class*="brand_"][class*="button_"]:hover:not(:disabled) {
+  filter: brightness(1.08) saturate(1.05);
+}
+button[class*="lookFilled_"][class*="colorBrand_"]:active:not(:disabled),
+button[class*="brand_"][class*="button_"]:active:not(:disabled) {
+  filter: brightness(0.94);
+}
+button[class*="lookFilled_"][class*="colorBrand_"]:focus-visible,
+button[class*="brand_"][class*="button_"]:focus-visible {
+  outline: 2px solid var(--nx-accent) !important;
+  outline-offset: 2px !important;
+}
+button[class*="lookFilled_"][class*="colorBrand_"]:disabled,
+button[class*="brand_"][class*="button_"]:disabled,
+button[class*="lookFilled_"][class*="colorBrand_"][aria-disabled="true"] {
+  filter: grayscale(0.6) !important;
+  opacity: 0.5 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+/* Kırmızı (tehlikeli) butonlar kırmızı kalsın */
+button[class*="colorRed_"], button[class*="colorDanger"], button[class*="critical_"] {
+  background: #da373c !important;
+  color: #fff !important;
+}
+
+/* ---------- Açılır pencereler ---------- */
+[role="dialog"][class*="root_"],
+[class*="focusLock_"] > [role="dialog"],
+[class*="menu_"][role="menu"],
+[class*="userPopout"],
+[class*="popout_"] {
+  border: 1px solid var(--nx-line-strong) !important;
+  border-radius: var(--nx-radius) !important;
+  box-shadow: 0 24px 60px -16px rgba(0, 0, 0, 0.8) !important;
+}
+[class*="menu_"][role="menu"] [role="menuitem"]:hover,
+[class*="menu_"][role="menu"] [class*="focused_"] {
+  background: var(--nx-accent) !important;
+  color: var(--nx-accent-ink) !important;
+}
+/* Menüdeki tehlikeli seçenekler (sunucudan ayrıl, sil...) vurguda da kırmızı */
+[class*="menu_"][role="menu"] [class*="colorDanger"]:hover,
+[class*="menu_"][role="menu"] [class*="colorDanger"][class*="focused_"] {
+  background: #da373c !important;
+  color: #fff !important;
+}
+[class*="backdrop_"] { background: rgba(0, 0, 0, 0.7) !important; }
+
+/* ---------- Alt kullanıcı paneli, konuşanlar ---------- */
+section[class*="panels_"] {
+  border-top: 1px solid var(--nx-line) !important;
+  background: var(--nx-bg-rail) !important;
+}
+[class*="avatarSpeaking_"],
+[class*="speaking_"] [class*="avatar_"] {
+  box-shadow: 0 0 0 2px var(--nx-accent-3), 0 0 12px var(--nx-accent-3) !important;
+}
+[class*="members_"] [class*="member_"] { border-radius: var(--nx-radius-sm) !important; }
+
+/* ---------- Başlık çubuğu ---------- */
+[class*="chat_"] > section[class*="title_"] {
+  border-bottom: 1px solid var(--nx-line) !important;
+  box-shadow: none !important;
+}
+[class*="chat_"] > section[class*="title_"] h1,
+[class*="chat_"] > section[class*="title_"] h2 {
+  font-family: var(--nx-font-display) !important;
+}
+
+/* =====================================================================
+   KART DÜZENİ (Tema Stüdyosu > Kart düzeni)
+   Sohbet alanı ve kanal listesi ayrı, yuvarlak köşeli kartlar olur.
+   ===================================================================== */
+html[data-nx-cards] [class^="page_"],
+html[data-nx-cards] [class*=" page_"] {
+  margin: 0 10px 10px 0 !important;
+  border: 1px solid var(--nx-line-strong) !important;
+  border-radius: calc(var(--nx-radius) + 4px) !important;
+  overflow: hidden !important;
+  box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.9);
+}
+html[data-nx-cards] [class^="sidebarList_"],
+html[data-nx-cards] [class*=" sidebarList_"] {
+  margin: 0 10px 0 0 !important;
+  border: 1px solid var(--nx-line-strong) !important;
+  border-bottom: none !important;
+  border-radius: calc(var(--nx-radius) + 4px) calc(var(--nx-radius) + 4px) 0 0 !important;
+  overflow: hidden !important;
+}
+html[data-nx-cards] section[class*="panels_"] {
+  margin: 0 10px 10px 10px !important;
+  border: 1px solid var(--nx-line-strong) !important;
+  border-radius: calc(var(--nx-radius) + 4px) !important;
+}
+
+/* =====================================================================
+   SADE MOD (Tema Stüdyosu > Sade mod)
+   Nitro, mağaza, hediye ve çıkartma butonlarını gizler.
+   ===================================================================== */
+html[data-nx-clean] button[aria-label="Send a gift"],
+html[data-nx-clean] button[aria-label="Hediye gönder"],
+html[data-nx-clean] button[aria-label="Open sticker picker"],
+html[data-nx-clean] button[aria-label="Çıkartma seçiciyi aç"],
+html[data-nx-clean] button[aria-label="Apps"],
+html[data-nx-clean] button[aria-label="Uygulamalar"],
+html[data-nx-clean] a[href="/store"],
+html[data-nx-clean] a[href="/shop"],
+html[data-nx-clean] a[href^="/quest-home"],
+html[data-nx-clean] li:has(> div > a[href="/store"]),
+html[data-nx-clean] li:has(> div > a[href="/shop"]),
+html[data-nx-clean] [class*="nitroWheel"],
+html[data-nx-clean] [class*="giftButton"] {
+  display: none !important;
+}
+
+/* Efektler kapalıyken ya da sistem "hareketi azalt" diyorsa animasyon yok */
+html:not([data-nx-fx]) body::before,
+html:not([data-nx-fx]) body::after {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before, body::after { animation: none !important; }
+}
+
+/* =====================================================================
+   BAŞLIK ÇUBUĞU VE PENCERE BUTONLARI
+   ===================================================================== */
+[class^="base_"] > [class^="bar_"],
+[class*=" base_"] > [class^="bar_"] {
+  position: relative;
+  -webkit-app-region: drag;
+  padding-right: 150px !important;
+  background: var(--nx-bar-bg, transparent) !important;
+}
+[class^="base_"] > [class^="bar_"] button,
+[class^="base_"] > [class^="bar_"] [role="button"],
+[class^="base_"] > [class^="bar_"] a,
+[class^="base_"] > [class^="bar_"] input {
+  -webkit-app-region: no-drag;
+}
+[class^="base_"] > [class^="bar_"] [class*="title_"] {
+  font-family: var(--nx-font-display) !important;
+  color: var(--nx-text-2) !important;
+  letter-spacing: 0.03em;
+}
+[class^="base_"] > [class^="bar_"]::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: var(--nx-grad);
+  background-size: 200% 100%;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* Discord'un çubuğu olmayan ekranlarda (giriş vb.) kendi çubuğumuz */
+#enex-titlebar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 32px;
+  z-index: 2147483646;
+  display: flex;
+  align-items: center;
+  padding-left: 14px;
+  background: var(--nx-bar-bg, var(--nx-bg-rail));
+  border-bottom: 1px solid var(--nx-line);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+#enex-titlebar .nx-brand {
+  font: 700 11px/1 var(--nx-font-display);
+  letter-spacing: 0.32em;
+  background: var(--nx-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+html[data-nx-owntb] #app-mount {
+  position: fixed !important;
+  top: 32px; left: 0; right: 0; bottom: 0;
+  height: auto !important;
+}
+
+/* Pencere butonları: Windows'un ölçüleri (46 px geniş), temanın renkleri */
+#enex-controls {
+  position: fixed;
+  top: 0; right: 0;
+  height: 32px;
+  display: flex;
+  z-index: 2147483647;
+  -webkit-app-region: no-drag;
+}
+#enex-controls .nx-wbtn {
+  all: unset;
+  box-sizing: border-box;
+  width: 46px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--nx-text-2);
+  cursor: default;
+  transition: background-color 0.12s ease, color 0.12s ease;
+  -webkit-app-region: no-drag;
+}
+#enex-controls .nx-wbtn svg { display: block; width: 10px; height: 10px; shape-rendering: crispEdges; }
+#enex-controls .nx-wbtn:hover { background: color-mix(in srgb, var(--nx-head) 10%, transparent); color: var(--nx-head); }
+#enex-controls .nx-wbtn:active { background: color-mix(in srgb, var(--nx-head) 6%, transparent); color: var(--nx-text-2); }
+#enex-controls .nx-wbtn:focus-visible { outline: 2px solid var(--nx-accent); outline-offset: -2px; }
+#enex-controls .nx-close:hover { background: #c42b1c; color: #fff; }
+#enex-controls .nx-close:active { background: #b22a1b; color: rgba(255, 255, 255, 0.8); }
+#enex-controls .nx-close svg { shape-rendering: geometricPrecision; }
+
+/* =====================================================================
+   DUVAR KAĞIDI (Anime teması)
+   ===================================================================== */
+#enex-wall {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--nx-void);
+}
+#enex-wall .nx-wall-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.9s ease;
+}
+#enex-wall .nx-wall-shade {
+  position: absolute;
+  inset: 0;
+  background: #05030f;
+  transition: opacity 0.4s ease;
+}
+#enex-wall .nx-petals {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+#enex-wall .nx-kenburns {
+  animation: nx-kenburns 40s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes nx-kenburns {
+  0%   { transform: scale(1.02) translate3d(0, 0, 0); }
+  100% { transform: scale(1.1) translate3d(-1.5%, -1%, 0); }
+}

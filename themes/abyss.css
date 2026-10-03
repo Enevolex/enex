@@ -1,0 +1,97 @@
+/* DERİN OKYANUS — ışıldayan deniz canlıları, su altı ışık dalgaları */
+html:root {
+  --nx-void: #010a12;
+  --nx-backdrop:
+    radial-gradient(60% 45% at 50% -5%, rgba(56, 189, 248, 0.32), transparent 70%),
+    radial-gradient(35% 35% at 15% 85%, rgba(45, 212, 191, 0.18), transparent 70%),
+    radial-gradient(30% 30% at 85% 70%, rgba(99, 102, 241, 0.14), transparent 70%),
+    linear-gradient(180deg, #032033 0%, #021422 40%, #010a12 100%);
+  --nx-bg-rail: rgba(1, 10, 18, 0.62);
+  --nx-bg-side: rgba(3, 20, 33, 0.55);
+  --nx-bg-chat: rgba(2, 16, 28, 0.45);
+  --nx-bg-elev: rgba(4, 24, 40, 0.97);
+  --nx-bg-elev-2: rgba(6, 32, 52, 0.98);
+  --nx-bg-input: rgba(5, 30, 48, 0.68);
+  --nx-hover: rgba(94, 234, 212, 0.06);
+  --nx-active: rgba(94, 234, 212, 0.11);
+  --nx-selected: rgba(45, 212, 191, 0.18);
+  --nx-line: rgba(94, 234, 212, 0.11);
+  --nx-line-strong: rgba(94, 234, 212, 0.24);
+  --nx-accent: #2dd4bf;
+  --nx-accent-2: #38bdf8;
+  --nx-accent-3: #a5f3fc;
+  --nx-accent-ink: #01141f;
+  --nx-grad: linear-gradient(120deg, #2dd4bf, #38bdf8);
+  --nx-glow: rgba(45, 212, 191, 0.7);
+  --nx-text: #dff7f5;
+  --nx-text-2: #9ccfd0;
+  --nx-muted: #6a9fa6;
+  --nx-faint: #2a4d55;
+  --nx-head: #f0fdfa;
+  --nx-link: #7dd3fc;
+  --nx-mention-bg: rgba(56, 189, 248, 0.2);
+  --nx-mention-fg: #bae6fd;
+  --nx-mention-row: rgba(56, 189, 248, 0.09);
+  --nx-radius: 18px;
+  --nx-radius-sm: 12px;
+  --nx-head-spacing: 0.1em;
+  --nx-head-transform: uppercase;
+  --nx-scroll: rgba(45, 212, 191, 0.4);
+  --nx-msg-hover: linear-gradient(90deg, rgba(45, 212, 191, 0.07), transparent 75%);
+}
+
+[class*="sidebar_"] header h1,
+[class*="sidebar_"] header [class*="name_"] {
+  color: var(--nx-head) !important;
+  text-shadow: 0 0 14px rgba(45, 212, 191, 0.55);
+}
+[class*="modeSelected_"] [class*="link_"],
+[class*="sidebar_"] [aria-current="page"] {
+  background: linear-gradient(90deg, rgba(45, 212, 191, 0.22), rgba(56, 189, 248, 0.06) 80%, transparent) !important;
+  box-shadow: inset 0 0 0 1px rgba(94, 234, 212, 0.25), 0 0 16px -6px rgba(45, 212, 191, 0.6) !important;
+}
+form [class*="channelTextArea_"] {
+  border-radius: 999px !important;
+}
+button[class*="lookFilled_"][class*="colorBrand_"],
+button[class*="brand_"][class*="button_"] {
+  border-radius: 999px !important;
+}
+
+/* ---------- Efektler ---------- */
+/* Yukarıdan süzülen ışık huzmeleri */
+html[data-nx-fx] body::before {
+  background:
+    repeating-linear-gradient(100deg, transparent 0 60px, rgba(165, 243, 252, 0.035) 60px 90px, transparent 90px 170px),
+    var(--nx-backdrop);
+  background-size: 200% 100%, auto;
+  animation: nx-caustic 18s ease-in-out infinite alternate;
+}
+@keyframes nx-caustic {
+  from { background-position: 0% 0, 0 0; }
+  to   { background-position: 100% 0, 0 0; }
+}
+/* Yükselen ışıltılar */
+html[data-nx-fx] body::after {
+  background-image:
+    radial-gradient(2px 2px at 40px 60px, rgba(165, 243, 252, 0.8), transparent),
+    radial-gradient(1.5px 1.5px at 160px 220px, rgba(94, 234, 212, 0.7), transparent),
+    radial-gradient(3px 3px at 260px 120px, rgba(165, 243, 252, 0.35), transparent),
+    radial-gradient(1px 1px at 320px 300px, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(2px 2px at 90px 340px, rgba(56, 189, 248, 0.6), transparent);
+  background-size: 360px 380px;
+  animation: nx-rise 24s linear infinite;
+  opacity: 0.8;
+}
+@keyframes nx-rise {
+  from { background-position: 0 0; }
+  to   { background-position: 30px -380px; }
+}
+html[data-nx-fx] nav[class*="guilds_"],
+html[data-nx-fx] [class^="sidebar_"],
+html[data-nx-fx] [class^="members_"],
+html[data-nx-fx] form [class*="channelTextArea_"],
+html[data-nx-fx] [class*="menu_"][role="menu"],
+html[data-nx-fx] [class*="popout_"] {
+  backdrop-filter: blur(16px) saturate(130%);
+}
