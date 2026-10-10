@@ -51,6 +51,10 @@
   .card img { width: 100%; aspect-ratio: 16/9; object-fit: contain; border-radius: 8px; background: #000; display: block; }
   .card span { display: block; margin-top: 8px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   footer { padding: 12px 26px 18px; display: flex; justify-content: flex-end; border-top: 1px solid var(--line); }
+  footer { align-items: center; gap: 16px; }
+  .audio { margin-right: auto; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text); cursor: pointer; }
+  .audio input { width: 16px; height: 16px; accent-color: var(--violet); cursor: pointer; }
+  .audio small { color: var(--muted); }
   .cancel {
     appearance: none; height: 34px; padding: 0 16px; border-radius: 10px; cursor: pointer;
     border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04); color: var(--text);
@@ -72,15 +76,29 @@
     <button class="tab" data-kind="window" data-i="picker.windows"></button>
   </div>
   <main id="grid"></main>
-  <footer><button class="cancel" id="cancel" data-i="picker.cancel"></button></footer>
+  <footer>
+    <label class="audio" id="audioRow">
+      <input type="checkbox" id="audio">
+      <span id="audioText"></span>
+    </label>
+    <button class="cancel" id="cancel" data-i="picker.cancel"></button>
+  </footer>
 <script>
   let sources = [];
+  let audioSupported = false;
   let strings = {};
   const S = (k) => strings[k] || k;
   let kind = 'screen';
   const grid = document.getElementById('grid');
 
+  function renderAudio() {
+    const row = document.getElementById('audioRow');
+    row.hidden = !audioSupported;
+    document.getElementById('audioText').textContent = S(kind === 'window' ? 'picker.audio.window' : 'picker.audio.screen');
+  }
+
   function render() {
+    renderAudio();
     grid.innerHTML = '';
     const list = sources.filter(s => (kind === 'screen') === s.isScreen);
     if (!list.length) {
@@ -99,7 +117,7 @@
       const label = document.createElement('span');
       label.textContent = s.name;
       b.append(img, label);
-      b.addEventListener('click', () => window.picker.choose(s.id));
+      b.addEventListener('click', () => window.picker.choose({ id: s.id, audio: audioSupported && document.getElementById('audio').checked }));
       grid.appendChild(b);
     }
   }
@@ -114,6 +132,8 @@
 
   window.picker.getSources().then(res => {
     strings = res.strings || {};
+    audioSupported = Boolean(res.audioSupported);
+    document.getElementById('audio').checked = res.shareAudio !== false;
     sources = res.sources || [];
     document.title = S('picker.title');
     document.querySelectorAll('[data-i]').forEach(n => { n.textContent = S(n.dataset.i); });

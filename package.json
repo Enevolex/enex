@@ -1,8 +1,8 @@
 {
   "name": "enex",
   "productName": "Enex",
-  "version": "1.0.0",
-  "description": "A beautiful, themeable desktop shell for Discord with live wallpapers, smooth animations and a built-in unblocker.",
+  "version": "1.1.0",
+  "description": "A beautiful, themeable desktop shell for Discord with live wallpapers, an in-game overlay, game & music activity, smooth animations and a built-in unblocker.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",

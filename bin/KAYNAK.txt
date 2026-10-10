@@ -2,3 +2,11 @@ ciadpi.exe: ByeDPI (https://github.com/hufrea/byedpi) kaynak kodundan derlendi.
 commit: ba532298de7b28cfe854aea83d061369d13ca290
 Derleme: make windows CC=x86_64-w64-mingw32-gcc, sonra strip
 SHA256: ca28651b9e3218592c9c67671df6225af25f07d283e5089806d7de972cb35b2d
+
+enex-audio.exe: native/enex-audio.cpp dosyasindan derlendi.
+Derleme: x86_64-w64-mingw32-g++ -O2 -std=c++17 -static -s -o enex-audio.exe enex-audio.cpp -lole32 -lmmdevapi -luuid
+SHA256: 0ce87dac20b1fa08a86fc4ae960046e7925d7b7a6d92abcf6fce1e4339159a61
+
+enex-helper.exe: native/enex-helper.cpp dosyasindan derlendi (oyun algilama + on plandaki pencere).
+Derleme: x86_64-w64-mingw32-g++ -O2 -std=c++17 -static -s -municode -o enex-helper.exe enex-helper.cpp -luser32
+SHA256: 47f3fd07d9844b049249593b614619b02a6d3b398fe38004bf65e505cfe2fd4f

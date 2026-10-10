@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https://cdn.discordapp.com https://cdn.discordapp.net https://media.discordapp.net data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Enex Overlay</title>
+<style>
+  /* Oyun içi arayüz: tam ekran, saydam, tıklamalar içinden geçer (main.js). */
+  :root {
+    --accent: #a78bfa;
+    --speak: #3ba55d;
+    --card: rgba(12, 11, 20, .82);
+    --line: rgba(255, 255, 255, .09);
+    --text: #f2f1f8;
+    --muted: #a3a1b8;
+    --bad: #f0475b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: transparent; overflow: hidden; }
+  body {
+    font: 13px/1.35 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    color: var(--text); -webkit-font-smoothing: antialiased; user-select: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
+  }
+
+  /* Pencere içerik kadar küçük olduğu için bölge ekran genişliğinden bağımsız boyutlanır */
+  .zone { position: fixed; display: flex; flex-direction: column; gap: 6px; padding: 18px; width: max-content; max-width: 400px; }
+  .zone[hidden] { display: none; }
+  .tl { top: 0; left: 0; } .tr { top: 0; right: 0; align-items: flex-end; }
+  .bl { bottom: 0; left: 0; flex-direction: column-reverse; }
+  .br { bottom: 0; right: 0; align-items: flex-end; flex-direction: column-reverse; }
+
+  /* ---------- Ses kanalı ---------- */
+  #voice[hidden] { display: none; }
+  .chan {
+    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+    display: flex; align-items: center; gap: 6px; padding: 0 4px 2px;
+  }
+  .chan::before {
+    content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--speak);
+    box-shadow: 0 0 6px var(--speak);
+  }
+  .m { display: flex; align-items: center; gap: 8px; transition: opacity .2s; }
+  .m.idle { opacity: .78; }
+  .av {
+    width: 30px; height: 30px; border-radius: 50%; flex: none; object-fit: cover; background: #2b2a3a;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, .55); transition: box-shadow .12s ease;
+  }
+  .m.speaking .av { box-shadow: 0 0 0 2px var(--speak), 0 0 12px 1px var(--speak); }
+  .nm {
+    background: var(--card); border: 1px solid var(--line); border-radius: 7px;
+    padding: 4px 9px; font-weight: 600; max-width: 220px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .m.speaking .nm { border-color: color-mix(in srgb, var(--speak) 55%, transparent); }
+  .m.self .nm { color: color-mix(in srgb, var(--accent) 35%, #fff); }
+  .ic { width: 15px; height: 15px; flex: none; color: var(--bad); filter: drop-shadow(0 1px 1px rgba(0,0,0,.7)); }
+  .tr .m, .br .m { flex-direction: row-reverse; }
+  .more { color: var(--muted); font-size: 12px; padding-left: 40px; }
+  .tr .more, .br .more { padding: 0 40px 0 0; }
+
+  /* ---------- Bildirimler ---------- */
+  .toast {
+    width: 340px; display: flex; gap: 11px; align-items: flex-start;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    border-left: 3px solid var(--accent);
+    padding: 11px 13px; box-shadow: 0 10px 28px -10px rgba(0, 0, 0, .7);
+    animation: in .28s cubic-bezier(.2, .9, .3, 1.15) both;
+  }
+  .toast.out { animation: out .25s ease forwards; }
+  .toast img { width: 36px; height: 36px; border-radius: 50%; flex: none; object-fit: cover; background: #2b2a3a; }
+  .toast .tx { min-width: 0; flex: 1; }
+  .toast b { display: block; font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .toast p {
+    color: #d9d7e6; margin-top: 2px; overflow: hidden; display: -webkit-box;
+    -webkit-line-clamp: 3; -webkit-box-orient: vertical; word-break: break-word;
+  }
+  @keyframes in { from { opacity: 0; transform: translateX(var(--from, 24px)) scale(.97); } }
+  @keyframes out { to { opacity: 0; transform: translateX(var(--from, 24px)); } }
+  .tl .toast, .bl .toast { --from: -24px; }
+</style>
+</head>
+<body>
+  <div class="zone tl" id="voiceZone">
+    <div id="voice" hidden></div>
+  </div>
+  <div class="zone tr" id="toastZone"></div>
+
+<script>
+  const MAX_MEMBERS = 12;
+  const MAX_TOASTS = 3;
+  const TOAST_MS = 6000;
+  const OPPOSITE = { tl: 'tr', tr: 'tl', bl: 'br', br: 'bl' };
+  let labels = { more: '+{n}' };
+
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  };
+  const ICON_MUTE = '<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M15 11V5a3 3 0 0 0-5.7-1.3L15 9.4V11Zm-9.3-8.7L4.3 3.7 9 8.4V11a3 3 0 0 0 4.2 2.7l1.5 1.5A5 5 0 0 1 7 11H5a7 7 0 0 0 6 6.9V21h2v-3.1a7 7 0 0 0 3.1-1.3l4.2 4.2 1.4-1.4L5.7 2.3ZM19 11h-2c0 .6-.1 1.2-.3 1.7l1.5 1.5c.5-1 .8-2 .8-3.2Z"/></svg>';
+  const ICON_DEAF = '<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M3.7 2.3 2.3 3.7l3.1 3.1A9 9 0 0 0 3 13v5a3 3 0 0 0 3 3h1a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a7 7 0 0 1 1.8-4.7L20.3 21.7l1.4-1.4L3.7 2.3ZM12 4a7 7 0 0 1 7 7v.1h-2a2 2 0 0 0-1.6.8l1.4 1.4.2-.2h2v2.2l2 2V13a9 9 0 0 0-14-7.5l1.4 1.4A7 7 0 0 1 12 4Z"/></svg>';
+
+  // Her overlay penceresi tek bir bölge gösterir: ?zone=voice ya da ?zone=toast
+  const ZONE = new URLSearchParams(location.search).get('zone') === 'toast' ? 'toast' : 'voice';
+  const myZone = () => $(ZONE === 'toast' ? 'toastZone' : 'voiceZone');
+  $(ZONE === 'toast' ? 'voiceZone' : 'toastZone').hidden = true;
+
+  // ---------- Köşe ayarı (ana süreç bu bölgenin köşesini gönderir) ----------
+  function placeZones(corner) {
+    const c = OPPOSITE[corner] ? corner : 'tl';
+    myZone().className = 'zone ' + c;
+    reportSize();
+  }
+
+  // ---------- Pencere boyutu = içerik boyutu ----------
+  let lastSize = '';
+  function reportSize() {
+    const z = myZone();
+    const has = ZONE === 'toast' ? z.querySelector('.toast:not(.out)') !== null || z.children.length > 0 : !$('voice').hidden;
+    const r = z.getBoundingClientRect();
+    const s = { w: Math.ceil(r.width), h: Math.ceil(r.height), has };
+    const key = JSON.stringify(s);
+    if (key !== lastSize) { lastSize = key; window.overlay.reportSize(s); }
+  }
+  new ResizeObserver(reportSize).observe(myZone());
+  new MutationObserver(reportSize).observe(myZone(), { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden', 'class'] });
+
+  window.overlay.onConfig((cfg) => {
+    if (cfg.accent) document.documentElement.style.setProperty('--accent', cfg.accent);
+    if (cfg.labels) labels = { ...labels, ...cfg.labels };
+    placeZones(cfg.corner);
+  });
+
+  // ---------- Ses kanalı ----------
+  const avatars = new Map(); // id -> <img>, resim her güncellemede yeniden yüklenmesin
+
+  window.overlay.onVoice((v) => {
+    const box = $('voice');
+    if (!v || !v.members || !v.members.length) { box.hidden = true; box.replaceChildren(); return; }
+    box.hidden = false;
+    const nodes = [];
+    if (v.channel) nodes.push(el('div', 'chan', v.channel));
+    const keep = new Set();
+    for (const m of v.members.slice(0, MAX_MEMBERS)) {
+      keep.add(m.id);
+      const row = el('div', 'm' + (m.speaking ? ' speaking' : ' idle') + (m.self ? ' self' : ''));
+      let img = avatars.get(m.id);
+      if (!img || img.dataset.src !== m.avatar) {
+        img = el('img', 'av');
+        img.alt = '';
+        img.dataset.src = m.avatar;
+        img.src = m.avatar;
+        avatars.set(m.id, img);
+      }
+      row.append(img, el('span', 'nm', m.name));
+      if (m.deafened) row.insertAdjacentHTML('beforeend', ICON_DEAF);
+      else if (m.muted) row.insertAdjacentHTML('beforeend', ICON_MUTE);
+      nodes.push(row);
+    }
+    if (v.members.length > MAX_MEMBERS) {
+      nodes.push(el('div', 'more', labels.more.replace('{n}', v.members.length - MAX_MEMBERS)));
+    }
+    for (const id of avatars.keys()) if (!keep.has(id)) avatars.delete(id);
+    box.replaceChildren(...nodes);
+  });
+
+  // ---------- Bildirimler ----------
+  function dismiss(t) {
+    if (!t.isConnected || t.classList.contains('out')) return;
+    t.classList.add('out');
+    setTimeout(() => t.remove(), 260);
+  }
+
+  window.overlay.onToast((n) => {
+    const zone = $('toastZone');
+    const t = el('div', 'toast');
+    const img = el('img');
+    img.alt = '';
+    if (n.icon) img.src = n.icon; else img.style.display = 'none';
+    const tx = el('div', 'tx');
+    tx.append(el('b', null, n.title || ''), el('p', null, n.body || ''));
+    t.append(img, tx);
+    zone.prepend(t);
+    const live = [...zone.querySelectorAll('.toast:not(.out)')];
+    live.slice(MAX_TOASTS).forEach(dismiss);
+    setTimeout(() => dismiss(t), TOAST_MS);
+  });
+</script>
+</body>
+</html>

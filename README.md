@@ -18,7 +18,9 @@
 </p>
 
 <p align="center">
+  <a href="#-yenilikler-v11">Yenilikler</a> ·
   <a href="#-neden-enex">Neden Enex?</a> ·
+  <a href="#-oyuncular-için">Oyuncular için</a> ·
   <a href="#-temalar">Temalar</a> ·
   <a href="#-kurulum">Kurulum</a> ·
   <a href="#️-kısayollar">Kısayollar</a> ·
@@ -31,10 +33,27 @@
 uygulamasıdır. Hareketli duvar kağıtları, saydam cam pencereler, neon temalar ve akıcı
 animasyonlar… Üstelik Discord'a erişim engelliyse **tek tıkla, VPN'siz** bağlanır.
 
+Ve artık oyuncular için: **oyun içi arayüz**, **"Oynuyor / Dinliyor" durumu** ve oyundayken
+FPS'ini korumak için **oyun modu**.
+
 <p align="center">
   <img src="previews/anime.jpg" alt="Anime teması" width="88%">
   <br><sub><i>Anime teması: saydam Discord, arkada hareketli Sakura Gecesi duvar kağıdı</i></sub>
 </p>
+
+## 🆕 Yenilikler (v1.1)
+
+> **Enex 1.1, oyuncu güncellemesi.** Masaüstü Discord'da olup web sürümünde olmayan şeyleri
+> Enex'e getirdik, üstüne gizlilik ve performans ekledik. Tüm ayrıntılar
+> [CHANGELOG.md](CHANGELOG.md) dosyasında.
+
+- 🎮 **Oyun içi arayüz:** Oyundayken ses kanalındakiler (konuşan parlar) ve gelen mesajlar oyunun ekranında.
+- 🕹️ **"Oynuyor" durumu:** Açtığın oyun profilinde görünür. Discord'un tanıdığı ~10.500 oyun otomatik algılanır.
+- 🎵 **"Dinliyor" durumu:** Spotify, Apple Music, YouTube Music ya da tarayıcıda çaldığın müzik.
+- 🛡️ **Gizlilik filtresi:** Sadece müzik paylaşılır. İzlediğin videolar ve yetişkin içerik asla paylaşılmaz.
+- ⚡ **Oyun modu:** Oyundayken Enex'in efektleri durur, önceliği düşer. İşlemci ve ekran kartı oyuna kalır.
+- 🔌 **Rich Presence:** Kendi durumunu Discord'a gönderen oyunlar ve uygulamalar Enex'e bağlanır.
+- 🪟 **Ayrı pencerede yayın:** "Ayrı pencerede oynat" artık tarayıcıda değil, Enex'in içinde açılır.
 
 ## ✨ Neden Enex?
 
@@ -78,6 +97,52 @@ animasyonlar… Üstelik Discord'a erişim engelliyse **tek tıkla, VPN'siz** ba
 </table>
 
 Ses, görüntü, ekran paylaşımı, bildirimler: hepsi Discord'da nasılsa Enex'te de öyle çalışır.
+
+## 🎮 Oyuncular için
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🎮 Oyun içi arayüz</h3>
+      Oyundayken ses kanalındakiler köşede görünür, <b>konuşan parlar</b>. Gelen mesajlar
+      küçük bildirimler olarak düşer. Tıklamalar oyuna geçer, odağı çalmaz.
+      <br><br><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> ile oyunun içinden aç/kapa.
+    </td>
+    <td width="50%" valign="top">
+      <h3>🕹️ Oynuyor / 🎵 Dinliyor</h3>
+      Açtığın oyun ve çaldığın müzik, masaüstü Discord'daki gibi profilinde görünür.
+      Rich Presence destekleyen oyunlar (harita, karakter, parça adı…) da Enex'e bağlanır.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <h3>🛡️ Neyi paylaştığın senin elinde</h3>
+      Varsayılan <b>Akıllı</b> mod sadece müziği paylaşır: müzik uygulamaları ve tarayıcıda
+      çalan müzik videoları. Vlog, film, rastgele videolar paylaşılmaz.
+      <b>Yetişkin içerik her zaman engellenir.</b> İstersen kendi yasak kelimelerini ekle.
+    </td>
+    <td valign="top">
+      <h3>⚡ Oyun modu (FPS)</h3>
+      Oyun öndeyken Enex'in animasyonları, bulanıklık efektleri ve duvar kağıdı durur,
+      işlemci önceliği düşer. Overlay sadece içeriği kadar küçük pencerelerden oluşur.
+      Sesli sohbet hiç etkilenmez.
+    </td>
+  </tr>
+</table>
+
+**Paylaşım modları** (Tema Stüdyosu → Etkinlik paylaşımı):
+
+| Mod | Ne paylaşılır |
+|---|---|
+| Sadece müzik uygulamaları | Spotify, Apple Music, Deezer, TIDAL… Tarayıcıdan hiçbir şey. |
+| **Akıllı** (varsayılan) | Müzik uygulamaları + tarayıcıda çalan **müzik** (müzik videoları, YouTube Music, Spotify Web…) |
+| Her medya | Tarayıcıda izlediğin her şey. Yasak kelimeler yine de engellenir. |
+
+> [!TIP]
+> - Overlay'in görünmesi için oyunu **Kenarlıksız** ya da **Pencereli tam ekran** modunda çalıştır.
+>   Normal "Tam ekran" modunda Windows hiçbir pencereyi oyunun üstüne çizdirmez.
+> - Profilinde görünmesi için Discord'da *Kullanıcı Ayarları → Etkinlik Gizliliği →
+>   "Algılanan etkinlikleri başkalarıyla paylaş"* açık olmalı. Kapalıysa Tema Stüdyosu seni uyarır.
 
 ## 🎨 Temalar
 
@@ -126,11 +191,25 @@ flowchart LR
     A["🖥️ Enex penceresi<br/>tema · duvar kağıdı · animasyon"] --> B["discord.com<br/>Discord'un kendi web uygulaması"]
     A -. "Discord engelliyse" .-> C["🔓 ByeDPI<br/>sadece Enex'in trafiği"]
     C --> B
+    H["🔎 enex-helper<br/>çalışan oyunlar · ön plandaki pencere"] --> A
+    M["🎵 Windows medya bilgisi<br/>çalan şarkı"] --> A
+    R["🔌 Rich Presence<br/>discord-ipc"] --> A
+    A --> O["🎮 Oyun içi arayüz<br/>küçük, saydam, tıklama geçirir"]
 ```
 
-Enex, Discord'un resmi web uygulamasını açar ve üstüne sadece **CSS teması** giydirir. Discord
+Enex, Discord'un resmi web uygulamasını açar ve üstüne **CSS teması** giydirir. Discord
 engelliyse arka planda küçük bir yerel proxy ([ByeDPI](https://github.com/hufrea/byedpi))
 başlatır ve şifreli DNS kullanır. Birkaç yöntemi sırayla dener, çalışanı hatırlar.
+
+**Oyun ve müzik algılama:**
+- Küçük bir yardımcı program (`enex-helper.exe`) çalışan programları Discord'un tanınan
+  oyunlar listesiyle karşılaştırır. Masaüstü Discord ve arRPC ile aynı yöntem.
+- Çalan müzik Windows'un medya bilgisinden okunur.
+- Bulunanlar Discord'a, masaüstü uygulamasındaki gibi "yerel etkinlik" olarak verilir.
+- Hiçbir oyuna kod enjekte edilmez. Overlay ayrı bir penceredir; hile korumalarıyla
+  (Vanguard, EAC, BattlEye) çakışmaz.
+
+Bir şey çalışmazsa Tema Stüdyosu'ndaki **Tanılama günlüğü** (`enex-debug.log`) sorunun yerini gösterir.
 
 ## ⌨️ Kısayollar
 
@@ -140,6 +219,7 @@ başlatır ve şifreli DNS kullanır. Birkaç yöntemi sırayla dener, çalışa
 | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>8</kbd> | Temalar arasında geçiş |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd> | Efektleri aç/kapa (kasarsa kapat) |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> | Kart düzenini aç/kapa |
+| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> | Oyun içi arayüzü aç/kapa (oyundayken de çalışır) |
 | <kbd>Ctrl</kbd>+<kbd>R</kbd> | Yenile |
 | <kbd>Alt</kbd> | Menüyü göster |
 
@@ -171,6 +251,39 @@ yüzünden ban pek görülmüyor ama risk sıfır değil. Aşağıdaki uyarıya 
 <summary><b>Bilgisayarım kasıyor, ne yapayım?</b></summary>
 <br>
 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd> ile efektleri kapat ya da <b>Obsidyen</b> temasını seç.
+Oyundayken zaten <b>Oyun modu</b> devreye girer ve Enex'in efektlerini durdurur.
+</details>
+
+<details>
+<summary><b>Overlay FPS'imi düşürür mü?</b></summary>
+<br>
+Çok az. Overlay oyuna enjekte edilmez; sadece içeriği kadar büyük, saydam, küçük pencerelerdir.
+Oyundayken Enex'in animasyonları ve efektleri durur, işlemci önceliği düşer. Yine de her saniye
+önemliyse <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> ile overlay'i tamamen kapatabilirsin.
+</details>
+
+<details>
+<summary><b>İzlediğim videolar profilimde görünür mü?</b></summary>
+<br>
+Hayır, varsayılan <b>Akıllı</b> modda sadece müzik paylaşılır. Tarayıcıda çalan bir şey ancak müzik
+olduğu belliyse (albüm bilgisi, "Official Music Video", "ft.", "Topic" kanalı gibi) paylaşılır.
+Yetişkin içerik her modda engellenir; Tema Stüdyosu'ndan kendi yasak kelimelerini de ekleyebilirsin.
+Paylaşılmayan medyanın adı günlüğe bile yazılmaz.
+</details>
+
+<details>
+<summary><b>Oyunum algılanmıyor.</b></summary>
+<br>
+Enex, Discord'un tanıdığı oyunları otomatik bulur. Listede olmayan bir oyun ekranı tamamen
+kaplıyorsa overlay için yine oyun sayılır, ama profilinde "Oynuyor" olarak görünmez.
+Tema Stüdyosu'ndaki <b>Durum</b> bölümü oyun algılamanın çalışıp çalışmadığını gösterir.
+</details>
+
+<details>
+<summary><b>Hile koruması (Vanguard, EAC) yüzünden ban yer miyim?</b></summary>
+<br>
+Enex hiçbir oyuna dokunmaz, kod enjekte etmez; çalışan programların sadece adını okur.
+Overlay, oyunun üstünde duran sıradan bir penceredir.
 </details>
 
 <details>
@@ -189,11 +302,15 @@ etkilenmez. İstersen Tema Stüdyosu'ndan kapatabilirsin.
 ## ⚠️ Uyarı
 
 Enex, Discord Inc. ile bağlantılı değildir ve Discord tarafından onaylanmamıştır. Discord'un
-Hizmet Şartları istemciyi değiştirmeyi yasaklar. Kullanım sorumluluğu sana aittir.
+Hizmet Şartları istemciyi değiştirmeyi yasaklar. Etkinlik paylaşımı ve oyun içi arayüz için Enex,
+Discord'un web uygulamasının iç yapısıyla konuşur (Vencord ve Vesktop gibi). Kullanım sorumluluğu
+sana aittir.
 
 ## 📄 Lisans
 
 [MIT](LICENSE) © 2026 Enes · `bin/ciadpi.exe`, [ByeDPI](https://github.com/hufrea/byedpi)
-kaynak kodundan derlenmiştir (MIT, bkz. `bin/BYEDPI-LICENSE.txt`).
+kaynak kodundan derlenmiştir (MIT, bkz. `bin/BYEDPI-LICENSE.txt`). `bin/enex-helper.exe` ve
+`bin/enex-audio.exe` bu depodaki `native/` kaynaklarından derlenir (bkz. `bin/KAYNAK.txt`).
+Rich Presence protokolü [arRPC](https://github.com/OpenAsar/arrpc) (MIT) incelenerek yazılmıştır.
 
 <p align="center"><sub>Enex'i beğendiysen sağ üstten ⭐ vermeyi unutma!</sub></p>
