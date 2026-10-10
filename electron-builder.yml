@@ -6,12 +6,16 @@ directories:
 files:
   - main.js
   - i18n.js
+  - activity.js
+  - rpc.js
   - loading.html
   - picker.html
   - picker-preload.js
   - studio.html
   - studio-preload.js
   - discord-preload.js
+  - overlay.html
+  - overlay-preload.js
   - assets/logo.svg
   - wallpapers/**
   - themes/**

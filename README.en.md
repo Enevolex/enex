@@ -23,10 +23,26 @@
 see-through glass windows, neon themes and smooth animations. If Discord is blocked where you
 are, it connects **with one click, no VPN needed**.
 
+And now for gamers: an **in-game overlay**, **"Playing / Listening to" status** and a **game mode**
+that keeps your FPS where it belongs.
+
 <p align="center">
   <img src="previews/anime.jpg" alt="Anime theme" width="88%">
   <br><sub><i>Anime theme: transparent Discord over a live "Sakura Night" wallpaper</i></sub>
 </p>
+
+## 🆕 What's new (v1.1)
+
+> **Enex 1.1 is the gamer update.** We brought over what desktop Discord has and the web version
+> doesn't, then added privacy and performance on top. Full details in [CHANGELOG.md](CHANGELOG.md).
+
+- 🎮 **In-game overlay:** your voice channel (speakers glow) and incoming messages on the game's screen.
+- 🕹️ **"Playing" status:** the game you open shows on your profile. ~10,500 games recognized automatically.
+- 🎵 **"Listening to" status:** music from Spotify, Apple Music, YouTube Music or your browser.
+- 🛡️ **Privacy filter:** only music is shared. Videos you watch and adult content are never shared.
+- ⚡ **Game mode:** while you play, Enex's effects stop and its priority drops, leaving your CPU and GPU to the game.
+- 🔌 **Rich Presence:** games and apps that report their own status can connect to Enex.
+- 🪟 **Pop-out streams:** "Pop out" now opens inside Enex instead of your browser.
 
 ## ✨ Why Enex?
 
@@ -69,6 +85,52 @@ are, it connects **with one click, no VPN needed**.
 </table>
 
 Voice, video, screen sharing and notifications work exactly as they do in Discord.
+
+## 🎮 For gamers
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🎮 In-game overlay</h3>
+      See who's in your voice channel while you play, <b>speakers glow</b>. New messages pop up as
+      small notifications. Clicks pass through to the game; it never steals focus.
+      <br><br>Toggle it from inside a game with <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd>.
+    </td>
+    <td width="50%" valign="top">
+      <h3>🕹️ Playing / 🎵 Listening to</h3>
+      The game you open and the music you play show on your profile like desktop Discord.
+      Games with Rich Presence (map, character, track…) can connect to Enex too.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <h3>🛡️ You decide what's shared</h3>
+      The default <b>Smart</b> mode shares music only: music apps and music videos playing in your
+      browser. Vlogs, movies and random videos are not shared.
+      <b>Adult content is always blocked.</b> Add your own blocked words if you like.
+    </td>
+    <td valign="top">
+      <h3>⚡ Game mode (FPS)</h3>
+      While a game is in front, Enex's animations, blur and wallpaper stop and it runs at lower CPU
+      priority. The overlay is made of tiny windows only as big as their content.
+      Voice chat is never affected.
+    </td>
+  </tr>
+</table>
+
+**Sharing modes** (Theme Studio → Activity sharing):
+
+| Mode | What gets shared |
+|---|---|
+| Music apps only | Spotify, Apple Music, Deezer, TIDAL… Nothing from the browser. |
+| **Smart** (default) | Music apps + **music** playing in the browser (music videos, YouTube Music, Spotify Web…) |
+| Any media | Everything you play in the browser. Blocked words are still filtered. |
+
+> [!TIP]
+> - For the overlay to show, run your game in **Borderless** or **Windowed fullscreen**. In exclusive
+>   "Fullscreen" Windows draws nothing on top of the game.
+> - To appear on your profile, keep *User Settings → Activity Privacy → "Share your detected
+>   activities with others"* on in Discord. Theme Studio warns you if it's off.
 
 ## 🎨 Themes
 
@@ -117,12 +179,26 @@ flowchart LR
     A["🖥️ Enex window<br/>theme · wallpaper · animations"] --> B["discord.com<br/>Discord's own web app"]
     A -. "if Discord is blocked" .-> C["🔓 ByeDPI<br/>Enex traffic only"]
     C --> B
+    H["🔎 enex-helper<br/>running games · foreground window"] --> A
+    M["🎵 Windows media info<br/>current track"] --> A
+    R["🔌 Rich Presence<br/>discord-ipc"] --> A
+    A --> O["🎮 In-game overlay<br/>tiny, transparent, click-through"]
 ```
 
-Enex loads Discord's official web app and only adds a **CSS theme** on top. If Discord is
+Enex loads Discord's official web app and adds a **CSS theme** on top. If Discord is
 blocked, it starts a tiny local proxy ([ByeDPI](https://github.com/hufrea/byedpi)) in the
 background and uses encrypted DNS. It tries several methods in order and remembers the one
 that works.
+
+**Game and music detection:**
+- A small helper (`enex-helper.exe`) compares running programs with Discord's list of
+  recognized games, the same way desktop Discord and arRPC do.
+- The current track comes from Windows' media info.
+- Whatever is found is handed to Discord as a "local activity", just like the desktop app.
+- Nothing is injected into any game. The overlay is a separate window, so it doesn't clash with
+  anti-cheats (Vanguard, EAC, BattlEye).
+
+If something doesn't work, the **diagnostic log** in Theme Studio (`enex-debug.log`) shows where it stops.
 
 ## ⌨️ Shortcuts
 
@@ -132,6 +208,7 @@ that works.
 | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>8</kbd> | Switch theme |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd> | Toggle effects |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> | Toggle card layout |
+| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> | Toggle in-game overlay (works while gaming) |
 | <kbd>Ctrl</kbd>+<kbd>R</kbd> | Reload |
 | <kbd>Alt</kbd> | Show menu |
 
@@ -143,12 +220,15 @@ Copy a file in `themes/`, change its `--nx-...` colors and add it to the `THEMES
 ## ⚠️ Disclaimer
 
 Enex is not affiliated with or endorsed by Discord Inc. Modifying the Discord client is against
-Discord's Terms of Service. Bans for purely cosmetic changes are rare, but the risk is not zero.
-Use at your own risk.
+Discord's Terms of Service. For activity sharing and the overlay, Enex talks to the internals of
+Discord's web app (like Vencord and Vesktop do). Bans for client mods are rare, but the risk is not
+zero. Use at your own risk.
 
 ## 📄 License
 
 [MIT](LICENSE) © 2026 Enes · `bin/ciadpi.exe` is built from [ByeDPI](https://github.com/hufrea/byedpi)
-(MIT, see `bin/BYEDPI-LICENSE.txt`).
+(MIT, see `bin/BYEDPI-LICENSE.txt`). `bin/enex-helper.exe` and `bin/enex-audio.exe` are built from
+the `native/` sources in this repo (see `bin/KAYNAK.txt`). The Rich Presence protocol was written
+with [arRPC](https://github.com/OpenAsar/arrpc) (MIT) as a reference.
 
 <p align="center"><sub>Like Enex? Leave a ⭐!</sub></p>

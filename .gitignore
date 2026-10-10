@@ -24,3 +24,5 @@ desktop.ini
 # gizli bilgiler
 .env
 .env.*
+enex-debug.log
+enex-debug.log.old

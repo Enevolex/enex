@@ -137,6 +137,17 @@
   }
   .keys { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; font-size: 12.5px; color: var(--muted); align-items: center; }
   [hidden] { display: none !important; }
+  .now { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 2px; }
+  .now .item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .now .item b { font-weight: 600; }
+  .statelist { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .statelist div { display: flex; align-items: center; gap: 8px; }
+  .sub { padding: 2px 0 10px; }
+  .txtin {
+    font: inherit; font-size: 13px; color: var(--text); background: var(--panel-2); border: 1px solid var(--line-2);
+    border-radius: var(--r); height: 34px; padding: 0 10px; width: 100%;
+  }
+  .txtin:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 </style>
 </head>
 <body>
@@ -187,6 +198,68 @@
     </section>
 
     <section class="group">
+      <h2 data-i="studio.overlay"></h2>
+      <label class="toggle">
+        <span class="txt"><b data-i="studio.overlay.toggle"></b><small data-i="studio.overlay.hint"></small></span>
+        <span class="switch"><input type="checkbox" id="overlay"><span></span></span>
+      </label>
+      <div id="overlayOpts">
+        <div class="field">
+          <label data-i="studio.overlay.corner"></label>
+          <div class="seg" id="overlayCorner" role="group"></div>
+        </div>
+        <div class="btns" style="margin-top:10px">
+          <button class="btn" id="overlayTest" data-i="studio.overlay.test"></button>
+        </div>
+        <p class="hint" data-i="studio.overlay.fsHint"></p>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2 data-i="studio.perf"></h2>
+      <label class="toggle">
+        <span class="txt"><b data-i="studio.perf.toggle"></b><small data-i="studio.perf.hint"></small></span>
+        <span class="switch"><input type="checkbox" id="perfMode"><span></span></span>
+      </label>
+    </section>
+
+    <section class="group">
+      <h2 data-i="studio.activity"></h2>
+      <label class="toggle">
+        <span class="txt"><b data-i="studio.act.games"></b><small data-i="studio.act.games.hint"></small></span>
+        <span class="switch"><input type="checkbox" id="actGames"><span></span></span>
+      </label>
+      <label class="toggle">
+        <span class="txt"><b data-i="studio.act.music"></b><small data-i="studio.act.music.hint"></small></span>
+        <span class="switch"><input type="checkbox" id="actMusic"><span></span></span>
+      </label>
+      <div class="sub" id="musicSrcBox">
+        <div class="seg" id="musicSrc" role="group"></div>
+        <p class="hint" id="musicSrcHint"></p>
+        <div class="field">
+          <label for="musicBlock" data-i="studio.act.block"></label>
+          <input type="text" id="musicBlock" class="txtin" spellcheck="false">
+          <p class="hint" data-i="studio.act.block.hint"></p>
+        </div>
+      </div>
+      <label class="toggle">
+        <span class="txt"><b data-i="studio.act.rpc"></b><small data-i="studio.act.rpc.hint"></small></span>
+        <span class="switch"><input type="checkbox" id="actRpc"><span></span></span>
+      </label>
+      <div class="field">
+        <label data-i="studio.act.now"></label>
+        <div class="now" id="actNow"></div>
+      </div>
+      <div class="field">
+        <label data-i="studio.act.status"></label>
+        <div class="statelist" id="actState"></div>
+      </div>
+      <div class="btns" style="margin-top:10px">
+        <button class="btn" id="openLog" data-i="studio.act.log"></button>
+      </div>
+    </section>
+
+    <section class="group">
       <h2 data-i="studio.accent"></h2>
       <div class="accent-row">
         <input type="color" id="accent">
@@ -202,6 +275,7 @@
         <span><kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>1–8</kbd></span><span data-i="studio.key.themes"></span>
         <span><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>E</kbd></span><span data-i="studio.key.fx"></span>
         <span><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>L</kbd></span><span data-i="studio.key.cards"></span>
+        <span><kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>O</kbd></span><span data-i="studio.key.overlay"></span>
       </div>
     </section>
   </aside>
@@ -332,6 +406,66 @@
     $('dpiTest').disabled = busy;
   }
 
+  function renderOverlay() {
+    const { settings } = state;
+    $('overlay').checked = settings.overlay;
+    $('overlayOpts').hidden = !settings.overlay;
+    const seg = $('overlayCorner');
+    seg.innerHTML = '';
+    seg.setAttribute('aria-label', S('studio.overlay.corner'));
+    for (const c of ['tl', 'tr', 'bl', 'br']) {
+      const b = el('button', settings.overlayCorner === c ? 'on' : '', S('studio.overlay.' + c));
+      b.setAttribute('aria-pressed', settings.overlayCorner === c);
+      b.addEventListener('click', () => set({ overlayCorner: c }));
+      seg.appendChild(b);
+    }
+  }
+
+  function renderActivity() {
+    const { settings } = state;
+    const a = state.activity || {};
+    $('actGames').checked = settings.activityGames;
+    $('actMusic').checked = settings.activityMusic;
+    $('actRpc').checked = settings.activityRpc;
+    $('perfMode').checked = settings.perfMode;
+    $('musicSrcHint').textContent = S('studio.act.src.' + settings.musicSources + '.hint');
+    if (document.activeElement !== $('musicBlock')) $('musicBlock').value = settings.musicBlock || '';
+    $('musicSrcBox').hidden = !settings.activityMusic;
+    const seg = $('musicSrc');
+    seg.innerHTML = '';
+    for (const v of ['music', 'smart', 'all']) {
+      const b = el('button', settings.musicSources === v ? 'on' : '', S('studio.act.src.' + v));
+      b.addEventListener('click', () => set({ musicSources: v }));
+      seg.appendChild(b);
+    }
+    const now = $('actNow');
+    now.innerHTML = '';
+    const item = (cls, text) => {
+      const d = el('div', 'item');
+      d.append(el('span', 'dot ' + cls), el('span', null, text));
+      now.appendChild(d);
+    };
+    if (settings.activityGames) for (const g of a.games || []) item('on', S('studio.act.playing', { name: g }));
+    for (const r of a.rpcApps || []) item('on', S('studio.act.playing', { name: r }));
+    if (settings.activityMusic && a.music) item('on', S('studio.act.listening', { name: a.music }));
+    if (!now.children.length) item('', S('studio.act.none'));
+
+    const st = $('actState');
+    st.innerHTML = '';
+    const line = (cls, text) => { const d = el('div'); d.append(el('span', 'dot ' + cls), el('span', null, text)); st.appendChild(d); };
+    const hs = a.helper || 'off';
+    line(hs === 'running' ? 'on' : hs === 'off' ? '' : 'error', S('studio.act.helper.' + hs));
+    if (a.db === 'ready') line('on', S('studio.act.db.ready', { n: a.dbCount }));
+    else if (a.db === 'loading') line('search', S('studio.act.db.loading'));
+    else if (a.db === 'error') line('error', S('studio.act.db.error'));
+    if (settings.activityMusic && (a.media === 'unsupported' || a.media === 'error')) line('error', S('studio.act.media.unsupported'));
+    if (a.sharingOff) line('error', S('studio.act.sharingOff'));
+    if (a.musicHidden) line('', S('studio.act.hidden.' + a.musicHidden));
+    const bs = a.bridge || 'waiting';
+    line(bs === 'ready' ? 'on' : bs === 'partial' ? 'error' : 'search', S('studio.act.bridge.' + bs));
+    if (a.inGame) line('on', S('studio.act.ingame'));
+  }
+
   function render() {
     const { settings, themes } = state;
     const current = themes.find((t) => t.id === settings.theme) || themes[0];
@@ -342,6 +476,8 @@
     renderGrid();
     renderThemeOpts();
     renderDpi();
+    renderOverlay();
+    renderActivity();
     $('fx').checked = settings.fx;
     $('cards').checked = settings.cards;
     $('clean').checked = settings.clean;
@@ -384,6 +520,19 @@
     clearTimeout(accentTimer);
     accentTimer = setTimeout(() => set({ accent: $('accent').value }), 120);
   });
+  $('overlay').addEventListener('change', (e) => set({ overlay: e.target.checked }));
+  $('overlayTest').addEventListener('click', () => window.studio.testOverlay());
+  $('actGames').addEventListener('change', (e) => set({ activityGames: e.target.checked }));
+  $('actMusic').addEventListener('change', (e) => set({ activityMusic: e.target.checked }));
+  $('actRpc').addEventListener('change', (e) => set({ activityRpc: e.target.checked }));
+  let blockTimer = null;
+  $('musicBlock').addEventListener('input', () => {
+    clearTimeout(blockTimer);
+    blockTimer = setTimeout(() => set({ musicBlock: $('musicBlock').value }, true), 500);
+  });
+  $('perfMode').addEventListener('change', (e) => set({ perfMode: e.target.checked }));
+  $('openLog').addEventListener('click', () => window.studio.openLog());
+  window.studio.onActivity((a) => { if (state) { state.activity = a; renderActivity(); } });
   $('resetAccent').addEventListener('click', () => set({ accent: null }));
   window.studio.onDpi((d) => { if (state) { state.dpi = d; renderDpi(); } });
   window.studio.onState((s) => {
