@@ -43,6 +43,7 @@ that keeps your FPS where it belongs.
 - ⚡ **Game mode:** while you play, Enex's effects stop and its priority drops, leaving your CPU and GPU to the game.
 - 🔌 **Rich Presence:** games and apps that report their own status can connect to Enex.
 - 🪟 **Pop-out streams:** "Pop out" now opens inside Enex instead of your browser.
+- 🔊 **Volume up to 300%** *(v1.1.1)*: user and stream volume go up to 300%. Yellow from 100–200%, red from 200–300%, with warnings at high levels.
 
 ## ✨ Why Enex?
 

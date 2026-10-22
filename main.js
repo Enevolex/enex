@@ -489,7 +489,9 @@ function sendChrome() {
       minimize: t('win.minimize'),
       maximize: t('win.maximize'),
       restore: t('win.restore'),
-      close: t('win.close')
+      close: t('win.close'),
+      volWarn: t('vol.warn'),
+      volDanger: t('vol.danger')
     }
   });
 }
@@ -833,6 +835,20 @@ function pickScreenSource(sources) {
   });
 }
 
+// CSP'nin script-src kuralına 'unsafe-eval' ekle (yoksa default-src'yi temel alır)
+function allowEval(csp) {
+  const parts = csp.split(';').map((p) => p.trim()).filter(Boolean);
+  const idx = parts.findIndex((p) => /^script-src\s/i.test(p) || /^script-src$/i.test(p));
+  if (idx >= 0) {
+    if (!/'unsafe-eval'/.test(parts[idx])) parts[idx] += " 'unsafe-eval'";
+  } else {
+    const def = parts.find((p) => /^default-src(\s|$)/i.test(p));
+    if (!def) return csp; // script kuralı yok: zaten serbest
+    if (!/'unsafe-eval'/.test(def)) parts.push(def.replace(/^default-src/i, 'script-src') + " 'unsafe-eval'");
+  }
+  return parts.join('; ');
+}
+
 function setupSession() {
   const ses = session.defaultSession;
 
@@ -874,6 +890,20 @@ function setupSession() {
       console.error('Ekran paylaşımı hatası:', err);
       callback({});
     }
+  });
+
+  // Ses yükseltme (%300) Discord'un birkaç modülünü yüklenirken düzeltir; bunun için
+  // Discord sayfasının güvenlik politikasına (CSP) sadece 'unsafe-eval' eklenir.
+  // Vencord ve Vesktop da aynısını yapar. Başka hiçbir kural değişmez.
+  ses.webRequest.onHeadersReceived({ urls: ['https://discord.com/*', 'https://*.discord.com/*'] }, (details, callback) => {
+    const headers = details.responseHeaders || {};
+    if (details.resourceType === 'mainFrame' || details.resourceType === 'subFrame') {
+      for (const key of Object.keys(headers)) {
+        if (!/^content-security-policy(-report-only)?$/i.test(key)) continue;
+        headers[key] = headers[key].map((v) => allowEval(String(v)));
+      }
+    }
+    callback({ responseHeaders: headers });
   });
 
   // enex://wall/... → seçili duvar kağıdı dosyası (sadece o dosya, başka hiçbir şey)
@@ -1479,6 +1509,7 @@ ipcMain.on('enex:page', (e, p) => {
       instances: Array.isArray(p.instances) ? p.instances.slice(0, 6).map(Number) : [],
       showCurrentGame: p.showCurrentGame == null ? null : Boolean(p.showCurrentGame),
       dispatcherScore: Number(p.dispatcherScore) || 0,
+      boost: p.boost && typeof p.boost === 'object' ? JSON.parse(JSON.stringify(p.boost)) : undefined,
       stores: Array.isArray(p.stores) ? p.stores.map((s) => str(s, 40)).slice(0, 20) : [],
       error: p.error ? str(p.error, 300) : undefined
     };

@@ -10,7 +10,7 @@ const IS_POPOUT = location.pathname.startsWith('/popout');
 let gaming = false; // oyun öndeyken duvar kağıdı ve yaprak animasyonu durur (GPU oyuna kalsın)
 
 let wallState = null;
-let chrome = { clear: false, maximized: false, labels: { brand: 'ENEX', minimize: 'Minimize', maximize: 'Maximize', restore: 'Restore', close: 'Close' } };
+let chrome = { clear: false, maximized: false, labels: { brand: 'ENEX', minimize: 'Minimize', maximize: 'Maximize', restore: 'Restore', close: 'Close', volWarn: '', volDanger: '' } };
 
 function onBody(fn) {
   if (document.body) fn();
@@ -318,6 +318,106 @@ function applyGaming() {
   try { window.postMessage({ __enex: 'gaming', on: gaming }, '*'); } catch (_) {}
 }
 
+/* =====================================================================
+   SES KAYDIRICISI: %100–200 sarı, %200–300 kırmızı + uyarı
+   Kaydırıcının üst sınırı %300'e çıkınca (köprüdeki ses yükseltme) bölgeler renklenir.
+   Sarıya geçince bir kez bilgi, kırmızıya her girişte uyarı gösterilir.
+   ===================================================================== */
+const VOL_CSS = `
+[data-nx-vol] [class*="barFill"] { transition: background-color .15s ease; }
+[data-nx-vol="warn"] [class*="barFill"] { background-color: #f0b232 !important; }
+[data-nx-vol="danger"] [class*="barFill"] { background-color: #f23f43 !important; }
+[data-nx-vol="warn"] [class*="grabber"] { border-color: #f0b232 !important; box-shadow: 0 0 0 2px rgba(240,178,50,.35) !important; }
+[data-nx-vol="danger"] [class*="grabber"] { border-color: #f23f43 !important; box-shadow: 0 0 0 3px rgba(242,63,67,.45) !important; }
+[data-nx-vol] [class*="bar_"]:not([class*="barFill"]) {
+  background-image: linear-gradient(90deg, transparent 0 33.333%, rgba(240,178,50,.42) 33.333% 66.666%, rgba(242,63,67,.5) 66.666% 100%) !important;
+}
+#enex-vol-toast {
+  position: fixed; left: 50%; bottom: 28px; z-index: 2147483647; transform: translateX(-50%) translateY(12px);
+  max-width: min(520px, calc(100vw - 32px)); padding: 12px 16px 12px 14px; border-radius: 12px;
+  display: flex; gap: 10px; align-items: flex-start; pointer-events: none; opacity: 0;
+  font: 500 14px/1.4 "gg sans", "Segoe UI", system-ui, sans-serif; color: #fff;
+  background: rgba(20, 18, 28, .96); border: 1px solid rgba(255,255,255,.1); border-left: 4px solid #f0b232;
+  box-shadow: 0 12px 32px -8px rgba(0,0,0,.6); transition: opacity .18s ease, transform .18s ease;
+}
+#enex-vol-toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+#enex-vol-toast.danger { border-left-color: #f23f43; background: rgba(48, 12, 16, .97); }
+#enex-vol-toast b { display: block; font-weight: 700; margin-bottom: 2px; }
+#enex-vol-toast i { font-style: normal; font-size: 18px; line-height: 1.2; }
+`;
+let volToastTimer = null;
+let lastWarnAt = 0;
+function volToast(kind) {
+  const L = chrome.labels;
+  const text = kind === 'danger' ? L.volDanger : L.volWarn;
+  if (!text) return;
+  let el = document.getElementById('enex-vol-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'enex-vol-toast';
+    el.setAttribute('role', 'alert');
+    document.body.appendChild(el);
+  }
+  const [title, ...rest] = text.split('|');
+  el.replaceChildren();
+  const icon = document.createElement('i');
+  icon.textContent = kind === 'danger' ? '⚠️' : '🔊';
+  const box = document.createElement('div');
+  const b = document.createElement('b');
+  b.textContent = title;
+  box.append(b, document.createTextNode(rest.join('|')));
+  el.append(icon, box);
+  el.className = kind === 'danger' ? 'danger' : '';
+  requestAnimationFrame(() => el.classList.add('on'));
+  clearTimeout(volToastTimer);
+  volToastTimer = setTimeout(() => el.classList.remove('on'), kind === 'danger' ? 6000 : 4000);
+}
+function volZone(v) { return v > 200 ? 'danger' : v > 100 ? 'warn' : 'normal'; }
+function sliderRoot(el) {
+  let n = el;
+  for (let i = 0; i < 5 && n && n.parentElement; i++) {
+    n = n.parentElement;
+    if (n.querySelector('[class*="barFill"], [class*="bar_"]')) return n;
+  }
+  return el.parentElement || el;
+}
+function checkVolumeSlider(el) {
+  const max = Number(el.getAttribute('aria-valuemax'));
+  if (!(max > 200)) return; // sadece yükseltilmiş (%300) kaydırıcılar
+  const v = Number(el.getAttribute('aria-valuenow'));
+  if (!Number.isFinite(v)) return;
+  const root = sliderRoot(el);
+  const prev = root.getAttribute('data-nx-vol');
+  const zone = volZone(v);
+  if (prev === zone) return;
+  root.setAttribute('data-nx-vol', zone);
+  if (prev == null) return; // ilk görünüşte uyarma, sadece kullanıcı sürükleyince
+  if (zone === 'danger' && prev !== 'danger') volToast('danger');
+  else if (zone === 'warn' && prev === 'normal' && Date.now() - lastWarnAt > 60000) { lastWarnAt = Date.now(); volToast('warn'); }
+}
+if (!IS_POPOUT) {
+  onBody(() => {
+    const st = document.createElement('style');
+    st.id = 'enex-vol-css';
+    st.textContent = VOL_CSS;
+    (document.head || document.documentElement).appendChild(st);
+    const scan = (root) => {
+      if (root.nodeType !== 1) return;
+      if (root.matches && root.matches('[role="slider"][aria-valuemax]')) checkVolumeSlider(root);
+      if (root.querySelectorAll) root.querySelectorAll('[role="slider"][aria-valuemax]').forEach(checkVolumeSlider);
+    };
+    new MutationObserver((muts) => {
+      for (const m of muts) {
+        if (m.type === 'attributes') {
+          if (m.target.getAttribute && m.target.getAttribute('role') === 'slider') checkVolumeSlider(m.target);
+        } else {
+          for (const n of m.addedNodes) scan(n);
+        }
+      }
+    }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['aria-valuenow', 'aria-valuemax'] });
+  });
+}
+
 ipcRenderer.on('enex:gaming', (_e, on) => {
   if (IS_POPOUT || gaming === Boolean(on)) return;
   gaming = Boolean(on);
@@ -491,12 +591,120 @@ function enexInstallBridge() {
   // İlk yakalanan çoğu zaman küçük bir yardımcı örnektir; bu yüzden hepsini oluştukları anda
   // yakalayıp hepsinde ararız (Vencord'un yöntemi: Function.prototype.m ayarlayıcısı).
   const instances = new Set();
+
+  /* ---------- SES YÜKSELTME (%300'e kadar) ----------
+     Web Discord'da kişi/yayın sesi kaydırıcısı en fazla %100 (masaüstünde %200), çünkü ses
+     tarayıcının en fazla %100 çalabilen <audio> öğesinden geçer. Vencord'un VolumeBooster
+     yöntemiyle: Discord'un birkaç modülü yüklenirken küçük düzeltmeler yapılır (kaydırıcı
+     sınırı %300, ses bir GainNode üzerinden çalınır). Düzeltme tutmazsa modül olduğu gibi kalır. */
+  const ID = '(?:[A-Za-z_$][\\w$]*)';
+  const rx = (src) => new RegExp(src.replace(/\\i/g, ID));
+  const BOOST_PATCHES = [
+    { // Kişi sesi kaydırıcısı: maxValue: isPlatformEmbedded ? 200 : 100  ->  200 * 1.5
+      id: 'userSlider',
+      test: (c) => c.includes('isPlatformEmbedded?') && c.includes('maxValue:'),
+      rep: [[rx('(?<=maxValue:)\\i\\.isPlatformEmbedded\\?(\\i\\.\\i):\\i\\.\\i(?=,)'), '$1*1.5']]
+    },
+    { // Yayın sesi kaydırıcısı
+      id: 'streamSlider',
+      test: (c) => c.includes('currentVolume:') && c.includes('maxValue:'),
+      rep: [[rx('(?<=maxValue:)\\i\\.\\i\\?(\\d+?):\\d+?(?=,)'), '$1*1.5']]
+    },
+    { // Web ses motoru: %100 sınırını kaldır, sesi GainNode'dan geçir (hepsi birden ya da hiçbiri)
+      id: 'webAudio', group: true,
+      test: (c) => c.includes('streamSourceNode'),
+      rep: [
+        [/Math\.max.{0,30}\)\)/, 'arguments[0]'],
+        [/\}return"video"/, 'this.updateAudioElement();$&'],
+        [/\.volume=this\._volume\/100;/, '.volume=0.00;window.__enexBoost(this);']
+      ]
+    },
+    { // Ayar eşitlemesi Discord sunucusuna 200'den büyük değer göndermesin
+      id: 'syncClamp',
+      test: (c) => c.includes('AudioContextSettingsMigrated'),
+      rep: [
+        [rx('(?<=isLocalMute\\(\\i,\\i\\),volume:(\\i).+?\\(0,\\i\\.\\i\\)\\(\\i,\\i,\\{volume:)\\1(?=\\}\\))'), '$&>200?200:$&'],
+        [rx('(?<=Object\\.entries\\(\\i\\.localMutes\\).+?volume:).+?(?=,)'), '$&>200?200:$&'],
+        [rx('(?<=Object\\.entries\\(\\i\\.localVolumes\\).+?volume:).+?(?=})'), '$&>200?200:$&']
+      ]
+    },
+    { // Eşitleme, 200'ün üstündeki yerel ses ayarını ezmesin
+      id: 'storeKeep',
+      test: (c) => c.includes('="MediaEngineStore",'),
+      rep: [[rx('(\\.settings\\.audioContextSettings.+?)(\\i\\[\\i\\])=(\\i\\.volume)(.+?setLocalVolume\\(\\i,).+?\\)'),
+        (_, a, lv, sv, b) => `${a}(${lv}>200?void 0:${lv}=${sv})${b}${lv}??${sv})`]]
+    }
+  ];
+  const boostStats = {};
+  function patchFactory(id, f) {
+    if (typeof f !== 'function') return f;
+    let src;
+    try { src = Function.prototype.toString.call(f); } catch (_) { return f; }
+    let code = null;
+    for (const p of BOOST_PATCHES) {
+      if (!p.test(src)) continue;
+      if (code == null) code = '0,' + (src.startsWith('(') ? '' : 'function') + src.slice(src.indexOf('('));
+      const st = boostStats[p.id] || (boostStats[p.id] = { seen: 0, applied: 0 });
+      st.seen++;
+      let next = code;
+      let missed = false;
+      for (const [m, r] of p.rep) {
+        const out = next.replace(m, r);
+        if (out === next) missed = true; else next = out;
+      }
+      if (p.group && missed) continue;
+      if (next !== code) { code = next; st.applied++; }
+    }
+    if (code == null) return f;
+    try {
+      // eslint-disable-next-line no-eval
+      return (0, eval)(`// Enex: ses yükseltme (modül ${String(id)})\n${code}\n//# sourceURL=enex:///WebpackModule${String(id)}`);
+    } catch (err) {
+      boostStats.error = String(err && err.message).slice(0, 160);
+      return f;
+    }
+  }
+  function wrapModules(mods) {
+    if (!mods || typeof mods !== 'object' || mods.__enexWrapped) return mods;
+    try { for (const k of Object.keys(mods)) mods[k] = patchFactory(k, mods[k]); } catch (_) {}
+    const px = new Proxy(mods, {
+      set(t, k, f) { t[k] = patchFactory(k, f); return true; },
+      get(t, k) { return k === '__enexWrapped' ? true : t[k]; }
+    });
+    return px;
+  }
+  // Discord'un ses akışı nesnesi için: sesi GainNode üzerinden, istenen seviyede çal
+  try {
+    Object.defineProperty(window, '__enexBoost', {
+      configurable: false,
+      enumerable: false,
+      value: function (data) {
+        try {
+          if (!data || !data.stream || !data.audioContext || data.stream.getAudioTracks().length === 0) return;
+          const ctx = data.audioContext;
+          if (!data.streamSourceNode) data.streamSourceNode = ctx.createMediaStreamSource(data.stream);
+          if (!data.gainNode) {
+            const g = data.gainNode = ctx.createGain();
+            data.streamSourceNode.connect(g);
+            g.connect(ctx.destination);
+          }
+          if (data.sinkId != null && data.sinkId !== ctx.sinkId && typeof ctx.setSinkId === 'function') {
+            ctx.setSinkId(data.sinkId === 'default' ? '' : data.sinkId).catch(() => {});
+          }
+          data.gainNode.gain.value = data._mute ? 0 : Math.max(0, Math.min(3, (Number(data._volume) || 0) / 100));
+        } catch (_) {}
+      }
+    });
+  } catch (_) {}
+
   try {
     Object.defineProperty(Function.prototype, 'm', {
       configurable: true,
       enumerable: false,
       set(v) {
-        Object.defineProperty(this, 'm', { value: v, configurable: true, enumerable: true, writable: true });
+        let val = v;
+        try { if (v && typeof v === 'object' && typeof this === 'function') val = wrapModules(v); } catch (_) {}
+        Object.defineProperty(this, 'm', { value: val, configurable: true, enumerable: true, writable: true });
         try { if (v && typeof v === 'object' && typeof this === 'function') instances.add(this); } catch (_) {}
       }
     });
@@ -813,6 +1021,7 @@ function enexInstallBridge() {
       instances: sizes.slice(0, 6),
       dispatcher: Boolean(Dispatcher),
       dispatcherScore,
+      boost: boostStats,
       stores: Object.keys(S),
       voice: voiceReady,
       user: Boolean(myId()),

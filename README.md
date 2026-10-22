@@ -54,6 +54,7 @@ FPS'ini korumak için **oyun modu**.
 - ⚡ **Oyun modu:** Oyundayken Enex'in efektleri durur, önceliği düşer. İşlemci ve ekran kartı oyuna kalır.
 - 🔌 **Rich Presence:** Kendi durumunu Discord'a gönderen oyunlar ve uygulamalar Enex'e bağlanır.
 - 🪟 **Ayrı pencerede yayın:** "Ayrı pencerede oynat" artık tarayıcıda değil, Enex'in içinde açılır.
+- 🔊 **Ses %300'e kadar** *(v1.1.1)*: Kişi ve yayın sesi %300'e kadar açılır. %100–200 sarı, %200–300 kırmızı; yüksek seviyelerde uyarı çıkar.
 
 ## ✨ Neden Enex?
 

@@ -2,6 +2,20 @@
 
 **Türkçe** · [English](#english)
 
+## [1.1.1] · 22 Ekim 2026
+
+### 🔊 Ses %300'e kadar
+
+- **Kişi ve yayın sesi artık %300'e kadar açılabiliyor.** Web Discord'da sınır %100'dü, masaüstü Discord'da %200. Enex artık ikisini de geçiyor.
+- **Renkli bölgeler:** Kaydırıcıda **%100–200 arası sarı**, **%200–300 arası kırmızı**.
+- **Uyarılar:**
+  - Sarı bölgeye geçince bir kez bilgi verilir (cızırtı olabilir).
+  - Kırmızı bölgeye her girişte uyarı çıkar (ani sesler kulağa ve hoparlöre zarar verebilir).
+- **Nasıl çalışıyor:** Ses, yükseltilebilen bir ses düğümünden (GainNode) geçiyor; Vencord'un VolumeBooster yöntemi. %100'de ses eskisiyle birebir aynı.
+- **Ayar eşitlemesi:** Discord hesabına en fazla %200 olarak eşitlenir; %300 ayarın bu bilgisayarda kalır.
+
+---
+
 ## [1.1.0] · 10 Ekim 2026: Oyuncu güncellemesi 🎮
 
 Masaüstü Discord'da olup web sürümünde olmayan oyuncu özelliklerini Enex'e getirdik. Üstüne,
@@ -85,6 +99,20 @@ oyun modu ekledik.
 <a id="english"></a>
 
 # English
+
+## [1.1.1] · October 22, 2026
+
+### 🔊 Volume up to 300%
+
+- **User and stream volume now go up to 300%.** Web Discord capped it at 100% and desktop Discord at 200%; Enex now goes past both.
+- **Colored zones:** the slider turns **yellow from 100–200%** and **red from 200–300%**.
+- **Warnings:**
+  - Entering the yellow zone shows a one-time notice (audio may crackle).
+  - Every time you enter the red zone you get a warning (sudden sounds can hurt your ears and speakers).
+- **How it works:** audio now plays through an amplifiable gain node (Vencord's VolumeBooster approach). At 100% it sounds exactly as before.
+- **Settings sync:** values sync to your Discord account capped at 200%; your 300% setting stays on this PC.
+
+---
 
 ## [1.1.0] · October 10, 2026: The gamer update 🎮
 
