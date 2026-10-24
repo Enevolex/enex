@@ -79,6 +79,7 @@ public final class Settings {
             d.put("musicBlock", "");
             d.put("fabX", -1);
             d.put("fabY", -1);
+            d.put("audioOut", "auto");      // sesli sohbet çıkışı: auto | speaker | earpiece
             d.put("version", 1);
         } catch (Exception ignored) {}
         return d;

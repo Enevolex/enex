@@ -138,7 +138,11 @@
   "perm.mic": "Sesli sohbet için mikrofon izni gerekiyor.",
   "webview.old": "Android System WebView çok eski. Play Store’dan güncelle, sonra Enex’i yeniden aç.",
   "exit.hint": "Enex arka planda bağlı kalıyor. Tamamen kapatmak için bildirimden “Kapat”a dokun.",
-  "loading.page": "Discord yükleniyor…"
+  "loading.page": "Discord yükleniyor…",
+  "menu.audio": "Ses çıkışı",
+  "audio.auto": "Otomatik (kulaklık varsa o, yoksa hoparlör)",
+  "audio.speaker": "Hoparlör",
+  "audio.earpiece": "Ahize (kulağa tut)"
  },
  "en": {
   "app.name": "Enex",
@@ -279,6 +283,10 @@
   "perm.mic": "Voice chat needs microphone permission.",
   "webview.old": "Android System WebView is too old. Update it from the Play Store, then reopen Enex.",
   "exit.hint": "Enex stays connected in the background. To quit completely, tap “Quit” in its notification.",
-  "loading.page": "Loading Discord…"
+  "loading.page": "Loading Discord…",
+  "menu.audio": "Audio output",
+  "audio.auto": "Automatic (headset if connected, else speaker)",
+  "audio.speaker": "Speaker",
+  "audio.earpiece": "Earpiece (hold to ear)"
  }
 }

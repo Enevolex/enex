@@ -95,6 +95,7 @@ public final class MainActivity extends Activity {
     private Notifier notifier;
     private Downloader downloader;
     private MusicWatcher music;
+    private AudioRouter audio;
 
     private FrameLayout root;
     private FrameLayout content;
@@ -137,6 +138,7 @@ public final class MainActivity extends Activity {
         notifier = new Notifier(this, unblocker);
         downloader = new Downloader(this, unblocker);
         music = new MusicWatcher(this, settings, this::sendToPage);
+        audio = new AudioRouter(this);
 
         buildUi();
         applyWindowLook();
@@ -386,12 +388,26 @@ public final class MainActivity extends Activity {
         boolean mobile = "mobile".equals(settings.str("layout"));
         if (mobile) m.add(0, 1, 0, drawerOpen ? I18n.t("menu.chat") : I18n.t("menu.drawer"));
         m.add(0, 2, 1, I18n.t("menu.studio"));
-        m.add(0, 3, 2, I18n.t("menu.reload"));
+        android.view.SubMenu out = m.addSubMenu(0, 4, 2, I18n.t("menu.audio"));
+        String cur = settings.str("audioOut");
+        for (int i = 0; i < AudioRouter.MODES.length; i++) {
+            String mode = AudioRouter.MODES[i];
+            out.add(1, 10 + i, i, I18n.t("audio." + mode)).setCheckable(true).setChecked(mode.equals(cur));
+        }
+        out.setGroupCheckable(1, true, true);
+        m.add(0, 3, 3, I18n.t("menu.reload"));
         pm.setOnMenuItemClickListener(it -> {
             switch (it.getItemId()) {
                 case 1: web.evaluateJavascript("window.__enexDrawer && window.__enexDrawer('toggle')", null); return true;
                 case 2: openStudio(); return true;
                 case 3: web.reload(); return true;
+                case 10: case 11: case 12: {
+                    String mode = AudioRouter.MODES[it.getItemId() - 10];
+                    settings.putQuiet("audioOut", mode);
+                    audio.apply(mode);
+                    Toast.makeText(this, I18n.t("audio." + mode), Toast.LENGTH_SHORT).show();
+                    return true;
+                }
             }
             return false;
         });
@@ -659,6 +675,9 @@ public final class MainActivity extends Activity {
                 break;
             case "save":
                 downloader.saveBase64(m.optString("name"), m.optString("mime"), m.optString("data"));
+                break;
+            case "voice":
+                audio.setVoice(m.optBoolean("on"), settings.str("audioOut"));
                 break;
             case "drawer":
                 drawerOpen = m.optBoolean("open");
@@ -1016,6 +1035,7 @@ public final class MainActivity extends Activity {
             KeepAliveService.stop(this);
             unblocker.shutdown();
         }
+        if (audio != null) audio.setVoice(false, null);
         if (web != null) {
             unblocker.setListener(null);
             web.stopLoading();

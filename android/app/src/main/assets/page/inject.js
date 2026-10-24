@@ -617,7 +617,7 @@
       rep: [
         [/Math\.max.{0,30}\)\)/, 'arguments[0]'],
         [/\}return"video"/, 'this.updateAudioElement();$&'],
-        [/\.volume=this\._volume\/100;/, '.volume=0.00;window.__enexBoost(this);']
+        [/\.volume=this\._volume\/100;/, '.volume=window.__enexVol(this);']
       ] },
     { id: 'syncClamp',
       test: (c) => c.includes('AudioContextSettingsMigrated'),
@@ -668,27 +668,68 @@
       get(t, k) { return k === '__enexWrapped' ? true : t[k]; }
     });
   }
+  /* Ses seviyesi (Android): %100'e kadar ses Discord'un kendi <audio> öğesinden çalar (telefonda
+     en güvenilir yol). Sadece %100'ün üstünde ses, yükseltilebilen bir GainNode'a aktarılır;
+     o yol çalışmazsa (ses bağlamı askıda vb.) öğe %100'de çalmaya devam eder: ses asla kesilmez. */
+  function boostPath(data, gain) {
+    const ctx = data.audioContext;
+    if (!data.streamSourceNode) data.streamSourceNode = ctx.createMediaStreamSource(data.stream);
+    if (!data.gainNode) {
+      const g = data.gainNode = ctx.createGain();
+      data.streamSourceNode.connect(g);
+      g.connect(ctx.destination);
+    }
+    data.gainNode.gain.value = gain;
+  }
   try {
-    Object.defineProperty(window, '__enexBoost', {
+    Object.defineProperty(window, '__enexVol', {
       configurable: false,
       enumerable: false,
       value: function (data) {
+        const v = data && !data._mute ? Math.max(0, Number(data._volume) || 0) : 0;
         try {
-          if (!data || !data.stream || !data.audioContext || data.stream.getAudioTracks().length === 0) return;
+          if (v <= 100 || !data.stream || !data.audioContext || data.stream.getAudioTracks().length === 0) {
+            if (data && data.gainNode) data.gainNode.gain.value = 0;
+            return Math.min(1, v / 100);
+          }
           const ctx = data.audioContext;
-          if (!data.streamSourceNode) data.streamSourceNode = ctx.createMediaStreamSource(data.stream);
-          if (!data.gainNode) {
-            const g = data.gainNode = ctx.createGain();
-            data.streamSourceNode.connect(g);
-            g.connect(ctx.destination);
+          if (ctx.state !== 'running') ctx.resume().catch(() => {});
+          if (ctx.state === 'running') {
+            boostPath(data, Math.min(3, v / 100));
+            return 0;
           }
-          if (data.sinkId != null && data.sinkId !== ctx.sinkId && typeof ctx.setSinkId === 'function') {
-            ctx.setSinkId(data.sinkId === 'default' ? '' : data.sinkId).catch(() => {});
-          }
-          data.gainNode.gain.value = data._mute ? 0 : Math.max(0, Math.min(3, (Number(data._volume) || 0) / 100));
+          if (data.gainNode) data.gainNode.gain.value = 0;
         } catch (_) {}
+        return 1;
       }
     });
+    // Eski adla da çalışsın (önbellekteki yamalı modüller için)
+    Object.defineProperty(window, '__enexBoost', {
+      configurable: false, enumerable: false,
+      value: function (data) { try { const el = data && (data._audioElement || data.audioElement); const r = window.__enexVol(data); if (el) el.volume = r; } catch (_) {} }
+    });
+  } catch (_) {}
+
+  /* Sesli sohbet başladı/bitti: uygulama ses yönlendirmesini (hoparlör/ahize) buna göre ayarlar */
+  try {
+    const md = navigator.mediaDevices;
+    if (md && md.getUserMedia) {
+      const orig = md.getUserMedia.bind(md);
+      const live = new Set();
+      const report = () => send({ t: 'voice', on: live.size > 0 });
+      md.getUserMedia = async function (c) {
+        const stream = await orig(c);
+        for (const tr of stream.getAudioTracks()) {
+          live.add(tr);
+          const end = () => { if (live.delete(tr)) report(); };
+          tr.addEventListener('ended', end);
+          const stop = tr.stop.bind(tr);
+          tr.stop = function () { end(); return stop(); };
+        }
+        report();
+        return stream;
+      };
+    }
   } catch (_) {}
 
   try {
