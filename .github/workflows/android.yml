@@ -73,6 +73,8 @@ jobs:
             exit "$code"
           fi
           cp app/build/outputs/apk/release/app-release.apk ../Enex-Android.apk
+          # APK içeriği özeti (ByeDPI her mimari için var mı?)
+          unzip -l ../Enex-Android.apk | grep -E "libciadpi|wallpapers/|themes/core|inject.js" | while IFS= read -r l; do echo "::notice::$l"; done
 
       - uses: actions/upload-artifact@v4
         with:
