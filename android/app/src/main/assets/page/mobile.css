@@ -1,0 +1,100 @@
+/* =====================================================================
+   ENEX ANDROID KATMANI — temalardan sonra yüklenir.
+   html[data-nx-android]: her zaman · html[data-nx-mobile]: Mobil düzen seçiliyken
+   data-nx-m="side|main|members" işaretlerini inject.js koyar.
+   ===================================================================== */
+
+/* Masaüstü pencere çubuğu boşluğu telefonda gereksiz */
+html[data-nx-android] [class^="base_"] > [class^="bar_"],
+html[data-nx-android] [class*=" base_"] > [class^="bar_"] {
+  padding-right: 8px !important;
+  -webkit-app-region: none !important;
+}
+html[data-nx-android] * { -webkit-tap-highlight-color: transparent; }
+
+/* Dokunmatik ekranda "üzerine gelme" efektleri yapışıp kalmasın */
+@media (hover: none) {
+  html[data-nx-android] li[id^="chat-messages-"] > div:hover {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ---------- Mobil düzen: tek sütun ---------- */
+html[data-nx-mobile] [data-nx-m="main"] {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+}
+html[data-nx-mobile]:not([data-nx-drawer]) [data-nx-m="side"] { display: none !important; }
+html[data-nx-mobile][data-nx-drawer] [data-nx-m="main"] { display: none !important; }
+html[data-nx-mobile][data-nx-drawer] [data-nx-m="side"] {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+html[data-nx-mobile][data-nx-drawer] [data-nx-m="side"] [data-nx-grow] {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+/* Kanal listesinin boyutlandırma tutamacı telefonda işe yaramaz */
+html[data-nx-mobile] [class*="sidebarResizeHandle"],
+html[data-nx-mobile] [class*="resizeHandle_"] { display: none !important; }
+
+/* Çekmece açılırken hafif kayma */
+html[data-nx-mobile][data-nx-fx][data-nx-drawer] [data-nx-m="side"] {
+  animation: nx-drawer-in 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html[data-nx-mobile][data-nx-fx]:not([data-nx-drawer]) [data-nx-m="main"] {
+  animation: nx-chat-in 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes nx-drawer-in { from { opacity: 0.4; transform: translate3d(-24px, 0, 0); } to { opacity: 1; transform: none; } }
+@keyframes nx-chat-in { from { opacity: 0.4; transform: translate3d(24px, 0, 0); } to { opacity: 1; transform: none; } }
+
+/* Kart düzeni telefonda daha ince kenar boşluklarıyla */
+html[data-nx-mobile][data-nx-cards] [class^="page_"],
+html[data-nx-mobile][data-nx-cards] [class*=" page_"] { margin: 0 6px 6px 6px !important; }
+html[data-nx-mobile][data-nx-cards] [class^="sidebarList_"],
+html[data-nx-mobile][data-nx-cards] [class*=" sidebarList_"] { margin: 0 6px 0 0 !important; }
+html[data-nx-mobile][data-nx-cards] section[class*="panels_"] { margin: 0 6px 6px 6px !important; }
+
+/* ---------- Üye listesi: sağdan kayan panel ---------- */
+html[data-nx-mobile] [data-nx-m="members"] { display: none !important; }
+html[data-nx-mobile][data-nx-members] [data-nx-m="members"] {
+  display: flex !important;
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: min(86vw, 340px) !important;
+  max-width: none !important;
+  z-index: 1001 !important;
+  background: var(--nx-bg-elev, #15151d) !important;
+  border-left: 1px solid var(--nx-line-strong, rgba(255, 255, 255, 0.14));
+  box-shadow: -24px 0 60px rgba(0, 0, 0, 0.6);
+}
+html[data-nx-mobile][data-nx-members] [data-nx-m="members"] > * { width: 100% !important; max-width: none !important; }
+#enex-scrim { display: none; }
+html[data-nx-mobile][data-nx-members] #enex-scrim {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- Telefonda dokunmayı kolaylaştır ---------- */
+html[data-nx-mobile] [class*="sidebar_"] a[class*="link_"] { min-height: 36px; }
+html[data-nx-mobile] form [class*="channelTextArea_"] { margin-bottom: 4px; }
+
+/* Masaüstüne özgü: QR ile giriş (telefonda kendi ekranını okutamazsın) */
+html[data-nx-android] [class*="qrLogin_"],
+html[data-nx-android] [class*="qrCodeContainer"] { display: none !important; }
+html[data-nx-android] [class*="authBox"] [class*="verticalSeparator_"] { display: none !important; }
+
+/* Duvar kağıdı tam ekranı kaplasın (adres çubuğu yok) */
+html[data-nx-android] #enex-wall { position: fixed; inset: 0; }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Enex" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/enex_void</item>
+        <item name="android:statusBarColor">@color/enex_void</item>
+        <item name="android:navigationBarColor">@color/enex_void</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorAccent">#8B5CF6</item>
+        <item name="android:colorPrimary">#8B5CF6</item>
+        <item name="android:popupMenuStyle">@style/Enex.PopupMenu</item>
+    </style>
+    <style name="Enex.PopupMenu" parent="@android:style/Widget.Material.PopupMenu">
+        <item name="android:popupBackground">@drawable/popup_bg</item>
+    </style>
+</resources>

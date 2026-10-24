@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Enex</title>
+<style>
+  :root {
+    --bg: #0b0a12; --panel: #12111c; --panel-2: #191826; --panel-3: #211f31;
+    --line: rgba(255,255,255,.07); --line-2: rgba(255,255,255,.13);
+    --text: #ecebf5; --muted: #8e8ca6; --accent: #a78bfa; --accent-ink: #0b0a12;
+    --ok: #4ade80; --bad: #f87171; --warn: #facc15;
+    --r: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { min-height: 100%; }
+  body {
+    font: 15px/1.45 system-ui, -apple-system, "Roboto", sans-serif;
+    background: transparent; color: var(--text); -webkit-font-smoothing: antialiased;
+    padding: 0 16px 40px; overflow-x: hidden;
+  }
+  .grab { width: 40px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.18); margin: 10px auto 6px; }
+
+  header.top { display: flex; align-items: center; gap: 12px; padding: 8px 0 4px; }
+  header.top img { width: 36px; height: 36px; flex: none; }
+  header.top .titles { flex: 1; min-width: 0; }
+  h1 { font: 700 21px/1.15 system-ui, sans-serif; letter-spacing: -.01em; }
+  .lead { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .x {
+    appearance: none; border: 0; background: var(--panel-2); color: var(--text); width: 36px; height: 36px; flex: none;
+    border-radius: 50%; font-size: 18px; line-height: 1; display: grid; place-items: center;
+  }
+  .x:active { background: var(--panel-3); }
+
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+  .card {
+    appearance: none; font: inherit; color: inherit; text-align: left; padding: 0;
+    display: flex; flex-direction: column; border-radius: 14px; overflow: hidden;
+    background: var(--panel); border: 1px solid var(--line);
+    transition: transform .15s cubic-bezier(.2,.8,.2,1), border-color .15s ease, box-shadow .15s ease;
+  }
+  .card:active { transform: scale(.97); }
+  .card.active { border-color: var(--c1); box-shadow: 0 0 0 1px var(--c1), 0 12px 30px -18px var(--c1); }
+  .shot { aspect-ratio: 1400 / 820; background: #000 center / cover no-repeat; position: relative; }
+  .badge {
+    position: absolute; top: 7px; right: 7px; background: var(--c1); color: #0b0a12; font-size: 9.5px; font-weight: 700;
+    padding: 3px 7px; border-radius: 999px; letter-spacing: .06em; display: none;
+  }
+  .card.active .badge { display: block; }
+  .meta { padding: 9px 10px 11px; display: flex; flex-direction: column; gap: 4px; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .name { font-weight: 650; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sw { display: flex; gap: 3px; flex: none; }
+  .sw i { width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); display: block; }
+  .desc { color: var(--muted); font-size: 11.5px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  .group { margin-top: 26px; }
+  .group h2 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 650; margin-bottom: 6px; }
+  .toggle { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .toggle:last-child { border-bottom: none; }
+  .toggle .txt { flex: 1; }
+  .toggle b { font-weight: 600; font-size: 15px; display: block; }
+  .toggle small { color: var(--muted); font-size: 12.5px; display: block; margin-top: 2px; }
+  .switch { position: relative; width: 44px; height: 26px; flex: none; margin-top: 1px; }
+  .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .switch span { position: absolute; inset: 0; background: #2d2b3d; border-radius: 999px; transition: background .18s; }
+  .switch span::after {
+    content: ""; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: #fff;
+    border-radius: 50%; transition: transform .2s cubic-bezier(.3,1.4,.6,1); box-shadow: 0 1px 3px rgba(0,0,0,.4);
+  }
+  .switch input:checked + span { background: var(--accent); }
+  .switch input:checked + span::after { transform: translateX(18px); }
+
+  .btn {
+    appearance: none; font-family: inherit; font-size: 14px; font-weight: 600; line-height: 1; color: var(--text);
+    height: 40px; padding: 0 16px; border-radius: var(--r);
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap;
+    background: var(--panel-2); border: 1px solid var(--line-2);
+  }
+  .btn:active:not(:disabled) { background: var(--panel-3); }
+  .btn:disabled { opacity: .45; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .btn .spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; display: none; }
+  .btn.busy .spin { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .seg { display: flex; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r); padding: 3px; gap: 3px; }
+  .seg button {
+    appearance: none; flex: 1; font-family: inherit; font-size: 13px; font-weight: 600; line-height: 1; color: var(--muted);
+    height: 34px; border: 0; border-radius: 9px; background: transparent;
+  }
+  .seg button.on { background: var(--accent); color: var(--accent-ink); }
+  header .seg { width: 100%; margin-top: 12px; }
+
+  .field { display: flex; flex-direction: column; gap: 8px; padding: 12px 0 4px; }
+  .field label { font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; }
+  .field label output { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+  input[type=range] { width: 100%; accent-color: var(--accent); height: 28px; }
+  .wall { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  .wall .cur { font-size: 13.5px; color: var(--muted); word-break: break-all; }
+  .wall .cur b { color: var(--text); font-weight: 600; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  .swatches button { appearance: none; width: 34px; height: 34px; border-radius: 50%; border: 2px solid transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+  .swatches button.on { border-color: #fff; }
+  .accent-row { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+  input[type=color] { width: 52px; height: 40px; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--panel-2); padding: 3px; }
+  .hint { color: var(--muted); font-size: 12.5px; margin-top: 8px; }
+  .status { display: flex; align-items: center; gap: 8px; font-size: 14px; margin: 8px 0 2px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #6b7280; flex: none; }
+  .dot.on { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  .dot.search { background: var(--warn); box-shadow: 0 0 8px var(--warn); animation: blink 1s infinite; }
+  .dot.error { background: var(--bad); box-shadow: 0 0 8px var(--bad); }
+  @keyframes blink { 50% { opacity: .35; } }
+  .result { font-size: 13px; margin-top: 8px; min-height: 1em; }
+  .result.ok { color: var(--ok); } .result.bad { color: var(--bad); }
+  [hidden] { display: none !important; }
+  .statelist { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .statelist div { display: flex; align-items: center; gap: 8px; }
+  .statelist .btn { height: 32px; font-size: 12.5px; padding: 0 12px; margin-left: auto; }
+  .sub { padding: 2px 0 10px; }
+  .txtin {
+    font: inherit; font-size: 14px; color: var(--text); background: var(--panel-2); border: 1px solid var(--line-2);
+    border-radius: var(--r); height: 40px; padding: 0 12px; width: 100%;
+  }
+  .about { color: var(--muted); font-size: 12.5px; margin-top: 8px; }
+</style>
+</head>
+<body>
+  <div class="grab"></div>
+  <header class="top">
+    <img src="logo.svg" alt="">
+    <div class="titles">
+      <h1 data-i="studio.title"></h1>
+      <p class="lead" data-i="studio.lead"></p>
+    </div>
+    <button class="x" id="close" aria-label="Kapat">✕</button>
+  </header>
+  <div class="seg" id="langSeg" role="group"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <section class="group">
+    <h2 data-i="studio.layout"></h2>
+    <div class="seg" id="layoutSeg" role="group"></div>
+    <p class="hint" id="layoutHint"></p>
+    <div class="field" id="scaleBox"></div>
+  </section>
+
+  <section class="group">
+    <h2 data-i="studio.look"></h2>
+    <label class="toggle">
+      <span class="txt"><b data-i="studio.fx"></b><small data-i="studio.fx.hint"></small></span>
+      <span class="switch"><input type="checkbox" id="fx"><span></span></span>
+    </label>
+    <label class="toggle">
+      <span class="txt"><b data-i="studio.cards"></b><small data-i="studio.cards.hint"></small></span>
+      <span class="switch"><input type="checkbox" id="cards"><span></span></span>
+    </label>
+    <label class="toggle">
+      <span class="txt"><b data-i="studio.clean"></b><small data-i="studio.clean.hint"></small></span>
+      <span class="switch"><input type="checkbox" id="clean"><span></span></span>
+    </label>
+  </section>
+
+  <section class="group" id="themeOpts" hidden></section>
+
+  <section class="group">
+    <h2 data-i="studio.accent"></h2>
+    <div class="swatches" id="swatches"></div>
+    <div class="accent-row">
+      <input type="color" id="accent">
+      <button class="btn" id="resetAccent" data-i="studio.accent.reset"></button>
+    </div>
+    <p class="hint" id="accentHint"></p>
+  </section>
+
+  <section class="group">
+    <h2 data-i="studio.network"></h2>
+    <label class="toggle">
+      <span class="txt"><b data-i="studio.dpi"></b><small data-i="studio.dpi.hint"></small></span>
+      <span class="switch"><input type="checkbox" id="dpi"><span></span></span>
+    </label>
+    <div class="status"><span class="dot" id="dpiDot"></span><span id="dpiText"></span></div>
+    <p class="hint" data-i="studio.dpi.auto"></p>
+    <div class="btns" style="margin-top:12px">
+      <button class="btn" id="dpiTest"><span class="spin"></span><span data-i="studio.dpi.test"></span></button>
+      <button class="btn" id="dpiResearch"><span class="spin"></span><span data-i="studio.dpi.research"></span></button>
+    </div>
+    <p class="result" id="dpiResult" role="status"></p>
+  </section>
+
+  <section class="group">
+    <h2 data-i="studio.notify"></h2>
+    <label class="toggle">
+      <span class="txt"><b data-i="studio.notify.toggle"></b><small data-i="studio.notify.hint"></small></span>
+      <span class="switch"><input type="checkbox" id="notify"><span></span></span>
+    </label>
+    <div class="statelist" id="notifState" hidden>
+      <div><span class="dot error"></span><span data-i="studio.notify.denied"></span>
+        <button class="btn" id="notifAllow" data-i="studio.notify.allow"></button></div>
+    </div>
+    <label class="toggle">
+      <span class="txt"><b data-i="studio.keepAlive"></b><small data-i="studio.keepAlive.hint"></small></span>
+      <span class="switch"><input type="checkbox" id="keepAlive"><span></span></span>
+    </label>
+  </section>
+
+  <section class="group">
+    <h2 data-i="studio.activity"></h2>
+    <label class="toggle">
+      <span class="txt"><b data-i="studio.act.music"></b><small data-i="studio.act.music.hint"></small></span>
+      <span class="switch"><input type="checkbox" id="actMusic"><span></span></span>
+    </label>
+    <div class="sub" id="musicSrcBox">
+      <div class="seg" id="musicSrc" role="group"></div>
+      <p class="hint" id="musicSrcHint"></p>
+      <div class="field">
+        <label for="musicBlock" data-i="studio.act.block"></label>
+        <input type="text" id="musicBlock" class="txtin" spellcheck="false" autocomplete="off">
+        <p class="hint" data-i="studio.act.block.hint"></p>
+      </div>
+      <div class="field">
+        <label data-i="studio.act.status"></label>
+        <div class="statelist" id="actState"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="group">
+    <h2 data-i="studio.about"></h2>
+    <p class="hint" data-i="studio.fab.hint"></p>
+    <div class="btns" style="margin-top:12px">
+      <button class="btn" id="shareLog" data-i="studio.log"></button>
+    </div>
+    <p class="about" id="version"></p>
+  </section>
+
+<script>
+  // ---- Uygulama köprüsü (EnexStudio) → masaüstündeki window.studio ile aynı biçim ----
+  const cbs = new Map();
+  let cbSeq = 0;
+  const call = (method) => new Promise((resolve) => {
+    const id = 'cb' + (++cbSeq);
+    cbs.set(id, resolve);
+    EnexStudio[method](id);
+  });
+  window.__studioCb = (id, result) => { const f = cbs.get(id); cbs.delete(id); if (f) f(result); };
+  const listeners = { state: [], dpi: [], activity: [] };
+  window.__studioPush = (kind, data) => { (listeners[kind] || []).forEach((f) => f(data)); };
+  window.studio = {
+    getState: () => Promise.resolve(JSON.parse(EnexStudio.getState())),
+    set: (patch) => Promise.resolve(JSON.parse(EnexStudio.set(JSON.stringify(patch)))),
+    testDpi: () => call('testDpi'),
+    researchDpi: () => call('researchDpi'),
+    pickWallpaper: () => call('pickWallpaper'),
+    onState: (f) => listeners.state.push(f),
+    onDpi: (f) => listeners.dpi.push(f),
+    onActivity: (f) => listeners.activity.push(f)
+  };
+
+  const SWATCHES = ['#8b5cf6', '#ec4899', '#22d3ee', '#ff8fb8', '#f5e100', '#2dd4bf', '#d4b06a', '#00ff66', '#f97316', '#ef4444'];
+  let state = null;
+  let accentTimer = null;
+  const $ = (id) => document.getElementById(id);
+  const S = (key, vars) => {
+    let s = (state && state.strings && state.strings[key]) || key;
+    if (vars) s = s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '');
+    return s;
+  };
+  const el = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  };
+
+  function applyStrings() {
+    document.documentElement.lang = state.lang;
+    document.querySelectorAll('[data-i]').forEach((n) => { n.textContent = S(n.dataset.i); });
+    $('close').setAttribute('aria-label', S('studio.close'));
+  }
+
+  function segment(box, items, current, onPick) {
+    box.innerHTML = '';
+    for (const [val, label] of items) {
+      const b = el('button', current === val ? 'on' : '', label);
+      b.setAttribute('aria-pressed', current === val);
+      b.addEventListener('click', () => onPick(val));
+      box.appendChild(b);
+    }
+  }
+
+  function renderLang() {
+    segment($('langSeg'), [['auto', S('studio.lang.auto')], ['tr', 'Türkçe'], ['en', 'English']], state.settings.lang, (v) => set({ lang: v }));
+  }
+
+  function renderGrid() {
+    const { settings, themes } = state;
+    const grid = $('grid');
+    grid.innerHTML = '';
+    for (const t of themes) {
+      const active = t.id === settings.theme;
+      const b = el('button', 'card' + (active ? ' active' : ''));
+      b.style.setProperty('--c1', t.colors[1]);
+      b.setAttribute('aria-pressed', active);
+      const shot = el('div', 'shot');
+      shot.style.backgroundImage = `url("previews/${t.id}.jpg")`;
+      shot.appendChild(el('span', 'badge', S('studio.active')));
+      const meta = el('div', 'meta');
+      const row = el('div', 'row');
+      const sw = el('span', 'sw');
+      for (const c of t.colors) { const i = el('i'); i.style.background = c; sw.appendChild(i); }
+      row.append(el('span', 'name', t.name), sw);
+      meta.append(row, el('span', 'desc', t.desc));
+      b.append(shot, meta);
+      b.addEventListener('click', () => set({ theme: t.id }));
+      grid.appendChild(b);
+    }
+  }
+
+  function slider(label, key, value, min, max, fmt) {
+    const f = el('div', 'field');
+    const l = el('label', null, label);
+    l.htmlFor = 'r-' + key;
+    const out = el('output', null, fmt(value));
+    l.appendChild(out);
+    const r = el('input');
+    Object.assign(r, { type: 'range', id: 'r-' + key, min, max, step: 0.01, value });
+    let tm = null;
+    r.addEventListener('input', () => {
+      out.textContent = fmt(Number(r.value));
+      clearTimeout(tm);
+      tm = setTimeout(() => set({ [key]: Number(r.value) }, true), 120);
+    });
+    f.append(l, r);
+    return f;
+  }
+  const pct = (v) => Math.round(v * 100) + '%';
+
+  function renderLayout() {
+    const { settings } = state;
+    segment($('layoutSeg'), [['mobile', S('studio.layout.mobile')], ['desktop', S('studio.layout.desktop')]], settings.layout, (v) => set({ layout: v }));
+    $('layoutHint').textContent = S(settings.layout === 'desktop' ? 'studio.layout.desktopHint' : 'studio.layout.mobileHint');
+    const box = $('scaleBox');
+    box.innerHTML = '';
+    box.hidden = settings.layout !== 'mobile';
+    if (!box.hidden) box.appendChild(slider(S('studio.scale'), 'uiScale', settings.uiScale, 0.6, 1.2, pct));
+  }
+
+  function renderThemeOpts() {
+    const box = $('themeOpts');
+    const { settings } = state;
+    box.innerHTML = '';
+    if (settings.theme !== 'glass' && settings.theme !== 'anime') { box.hidden = true; return; }
+    box.hidden = false;
+    if (settings.theme === 'glass') {
+      box.appendChild(el('h2', null, S('studio.glass')));
+      const seg = el('div', 'seg');
+      segment(seg, [['acrylic', S('studio.glass.acrylic')], ['clear', S('studio.glass.clear')]], settings.glassMode, (v) => set({ glassMode: v }));
+      box.append(seg,
+        el('p', 'hint', S(settings.glassMode === 'clear' ? 'studio.glass.clearHint' : 'studio.glass.acrylicHint')),
+        slider(S('studio.panelAlpha'), 'glassAlpha', settings.glassAlpha, 0, 0.9, pct));
+    } else {
+      box.appendChild(el('h2', null, S('studio.anime')));
+      const wall = el('div', 'wall');
+      const cur = el('div', 'cur', S('studio.wallpaper') + ': ');
+      cur.appendChild(el('b', null, state.wallpaperName || S(state.bundledIsAnime ? 'studio.wall.bundledAnime' : 'studio.wall.sakura')));
+      const btns = el('div', 'btns');
+      const pick = el('button', 'btn primary', S('studio.wall.pick'));
+      pick.addEventListener('click', async () => { state = await window.studio.pickWallpaper(); render(); });
+      btns.appendChild(pick);
+      if (state.wallpaperName) {
+        const reset = el('button', 'btn', S('studio.wall.reset'));
+        reset.addEventListener('click', () => set({ wallpaper: null, wallpaperName: null }));
+        btns.appendChild(reset);
+      }
+      wall.append(cur, btns, el('p', 'hint', S('studio.wall.hint')));
+      box.append(wall,
+        slider(S('studio.panelAlpha'), 'animeAlpha', settings.animeAlpha, 0, 0.9, pct),
+        slider(S('studio.wallDim'), 'wallDim', settings.wallDim, 0, 0.85, pct));
+    }
+  }
+
+  function renderAccent(current) {
+    const { settings } = state;
+    const accent = settings.accent || current.colors[1];
+    const sw = $('swatches');
+    sw.innerHTML = '';
+    for (const c of SWATCHES) {
+      const b = el('button', settings.accent && settings.accent.toLowerCase() === c ? 'on' : '');
+      b.style.background = c;
+      b.setAttribute('aria-label', c);
+      b.addEventListener('click', () => set({ accent: c }));
+      sw.appendChild(b);
+    }
+    $('accent').value = accent;
+    $('accentHint').textContent = settings.accent ? S('studio.accent.custom') : S('studio.accent.theme', { theme: current.name });
+  }
+
+  function renderDpi() {
+    const { settings, dpi } = state;
+    $('dpi').checked = settings.dpiEnabled;
+    $('dpiDot').className = 'dot ' + (dpi?.state || '');
+    $('dpiText').textContent = dpi?.message || '';
+    const busy = dpi?.state === 'search';
+    $('dpiResearch').disabled = !settings.dpiEnabled || busy;
+    $('dpiResearch').classList.toggle('busy', busy);
+    $('dpiTest').disabled = busy;
+  }
+
+  function renderNotify() {
+    const { settings } = state;
+    $('notify').checked = settings.notify;
+    $('keepAlive').checked = settings.keepAlive;
+    $('notifState').hidden = !(settings.notify && !state.notifAllowed);
+  }
+
+  function renderActivity() {
+    const { settings } = state;
+    const a = state.activity || {};
+    $('actMusic').checked = settings.activityMusic;
+    $('musicSrcHint').textContent = S('studio.act.src.' + settings.musicSources + '.hint');
+    if (document.activeElement !== $('musicBlock')) $('musicBlock').value = settings.musicBlock || '';
+    $('musicSrcBox').hidden = !settings.activityMusic;
+    segment($('musicSrc'), ['music', 'smart', 'all'].map((v) => [v, S('studio.act.src.' + v)]), settings.musicSources, (v) => set({ musicSources: v }));
+    const st = $('actState');
+    st.innerHTML = '';
+    const line = (cls, text, btn) => {
+      const d = el('div');
+      d.append(el('span', 'dot ' + cls), el('span', null, text));
+      if (btn) d.appendChild(btn);
+      st.appendChild(d);
+    };
+    if (!a.access) {
+      const b = el('button', 'btn', S('studio.act.access.grant'));
+      b.addEventListener('click', () => EnexStudio.openNotifAccess());
+      line('error', S('studio.act.access.missing'), b);
+    } else {
+      line('on', S('studio.act.access.ok'));
+      if (a.music) line('on', S('studio.act.listening', { name: a.music }));
+      else if (a.musicHidden) line('', S('studio.act.hidden.' + a.musicHidden));
+      else line('', S('studio.act.none'));
+    }
+    if (a.sharingOff) line('error', S('studio.act.sharingOff'));
+    const bs = a.bridge || 'waiting';
+    line(bs === 'ready' ? 'on' : bs === 'partial' ? 'error' : 'search', S('studio.act.bridge.' + bs));
+  }
+
+  function render() {
+    const { settings, themes } = state;
+    const current = themes.find((t) => t.id === settings.theme) || themes[0];
+    document.documentElement.style.setProperty('--accent', settings.accent || current.colors[1]);
+    applyStrings();
+    renderLang();
+    renderGrid();
+    renderLayout();
+    renderThemeOpts();
+    renderAccent(current);
+    renderDpi();
+    renderNotify();
+    renderActivity();
+    $('fx').checked = settings.fx;
+    $('cards').checked = settings.cards;
+    $('clean').checked = settings.clean;
+    $('version').textContent = S('studio.version', { v: state.version });
+  }
+
+  async function set(patch, quiet) {
+    state = await window.studio.set(patch);
+    if (!quiet) render();
+  }
+
+  $('close').addEventListener('click', () => EnexStudio.close());
+  $('fx').addEventListener('change', (e) => set({ fx: e.target.checked }));
+  $('cards').addEventListener('change', (e) => set({ cards: e.target.checked }));
+  $('clean').addEventListener('change', (e) => set({ clean: e.target.checked }));
+  $('notify').addEventListener('change', (e) => set({ notify: e.target.checked }));
+  $('keepAlive').addEventListener('change', (e) => set({ keepAlive: e.target.checked }));
+  $('notifAllow').addEventListener('click', () => EnexStudio.allowNotifications());
+  $('dpi').addEventListener('change', (e) => {
+    $('dpiText').textContent = S('studio.dpi.restarting');
+    $('dpiDot').className = 'dot search';
+    $('dpiResult').textContent = '';
+    set({ dpiEnabled: e.target.checked });
+  });
+  $('dpiTest').addEventListener('click', async () => {
+    const b = $('dpiTest'), out = $('dpiResult');
+    b.classList.add('busy'); b.disabled = true;
+    out.className = 'result'; out.textContent = S('studio.dpi.testing');
+    const r = await window.studio.testDpi();
+    b.classList.remove('busy'); b.disabled = false;
+    out.className = 'result ' + (r.ok ? 'ok' : 'bad');
+    out.textContent = (r.ok ? '✓ ' : '✕ ') + r.message;
+  });
+  $('dpiResearch').addEventListener('click', async () => {
+    $('dpiResult').textContent = '';
+    state.dpi = { state: 'search', message: S('dpi.searching', { i: 1, n: '…' }) };
+    renderDpi();
+    state = await window.studio.researchDpi();
+    render();
+  });
+  $('accent').addEventListener('input', () => {
+    clearTimeout(accentTimer);
+    accentTimer = setTimeout(() => set({ accent: $('accent').value }), 150);
+  });
+  $('resetAccent').addEventListener('click', () => set({ accent: null }));
+  $('actMusic').addEventListener('change', (e) => set({ activityMusic: e.target.checked }));
+  let blockTimer = null;
+  $('musicBlock').addEventListener('input', () => {
+    clearTimeout(blockTimer);
+    blockTimer = setTimeout(() => set({ musicBlock: $('musicBlock').value }, true), 500);
+  });
+  $('shareLog').addEventListener('click', () => EnexStudio.shareLog());
+
+  window.studio.onActivity((a) => { if (state) { state.activity = a; renderActivity(); } });
+  window.studio.onDpi((d) => { if (state) { state.dpi = d; renderDpi(); } });
+  window.studio.onState((s) => {
+    const dragging = document.activeElement && (document.activeElement.type === 'range' || document.activeElement.type === 'text');
+    state = s;
+    if (!dragging) render(); else { renderDpi(); renderNotify(); }
+  });
+
+  window.studio.getState().then((s) => { state = s; render(); });
+</script>
+</body>
+</html>

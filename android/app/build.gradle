@@ -1,0 +1,140 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Enex'in masaüstü projesi bu klasörün bir üstünde: temalar, önizlemeler ve duvar kağıtları
+// oradan alınır (tek kaynak; masaüstünde bir tema değişince Android'e de yansır).
+def enexRoot = rootProject.projectDir.parentFile
+def byedpiDir = rootProject.file('third_party/byedpi')
+def genAssets = layout.buildDirectory.dir('generated/enexAssets')
+def genJni = layout.buildDirectory.dir('generated/ciadpi')
+def CIADPI_ABIS = [
+        'arm64-v8a'  : 'aarch64-linux-android',
+        'armeabi-v7a': 'armv7a-linux-androideabi',
+        'x86_64'     : 'x86_64-linux-android'
+]
+def MIN_SDK = 26
+
+android {
+    namespace 'com.enevolex.enex'
+    compileSdk 35
+    ndkVersion '27.2.12479018'
+
+    defaultConfig {
+        applicationId 'com.enevolex.enex'
+        minSdk MIN_SDK
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+        ndk { abiFilters(*CIADPI_ABIS.keySet()) }
+    }
+
+    signingConfigs {
+        release {
+            // GitHub Actions: ENEX_KEYSTORE_B64 gizli değişkeninden çözülen anahtar deposu.
+            // Yoksa hata ayıklama anahtarıyla imzalanır (kurulur, ama her derlemede anahtar değişebilir).
+            def ks = System.getenv('ENEX_KEYSTORE')
+            if (ks != null && new File(ks).exists()) {
+                storeFile new File(ks)
+                storePassword System.getenv('ENEX_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ENEX_KEY_ALIAS')
+                keyPassword System.getenv('ENEX_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release.storeFile != null ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    buildFeatures { buildConfig true }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    // ciadpi bir program (kütüphane değil): APK'dan diske açılmalı ki çalıştırılabilsin
+    packaging { jniLibs { useLegacyPackaging true } }
+
+    androidResources {
+        // Videolar ve resimler sıkıştırılmasın: duvar kağıdı doğrudan okunur, sarma (seek) hızlı olur
+        noCompress += ['mp4', 'webm', 'jpg', 'png', 'svg']
+    }
+
+    sourceSets {
+        main {
+            assets.srcDirs += [genAssets.get().asFile.path]
+            jniLibs.srcDirs += [genJni.get().asFile.path]
+        }
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+}
+
+/* ---------- Masaüstü varlıklarını kopyala ---------- */
+def copyEnexAssets = tasks.register('copyEnexAssets', Copy) {
+    doFirst {
+        if (!new File(enexRoot, 'themes/core.css').exists()) {
+            throw new GradleException("Enex masaüstü dosyaları bulunamadı: ${enexRoot}/themes. " +
+                    "android/ klasörü Enex projesinin içinde olmalı.")
+        }
+    }
+    from(new File(enexRoot, 'themes')) { into 'themes' }
+    from(new File(enexRoot, 'previews')) { into 'previews' }
+    from(new File(enexRoot, 'wallpapers')) { into 'wallpapers' }
+    from(new File(enexRoot, 'assets')) { include 'logo.svg' }
+    into genAssets
+}
+
+/* ---------- ByeDPI (ciadpi) — NDK'nın clang'ıyla, her mimari için ---------- */
+static String ndkHostTag() {
+    def os = System.getProperty('os.name').toLowerCase()
+    if (os.contains('win')) return 'windows-x86_64'
+    if (os.contains('mac')) return 'darwin-x86_64'
+    return 'linux-x86_64'
+}
+
+def buildCiadpi = tasks.register('buildCiadpi') {
+    description = 'third_party/byedpi kaynaklarından libciadpi.so (çalıştırılabilir) üretir'
+    inputs.dir(byedpiDir)
+    outputs.dir(genJni)
+    doLast {
+        File ndk = null
+        try { ndk = androidComponents.sdkComponents.ndkDirectory.get().asFile } catch (Throwable ignored) {}
+        if (ndk == null || !ndk.exists()) {
+            try { ndk = android.ndkDirectory } catch (Throwable ignored) {}
+        }
+        if ((ndk == null || !ndk.exists()) && System.getenv('ANDROID_NDK_HOME')) ndk = new File(System.getenv('ANDROID_NDK_HOME'))
+        if (ndk == null || !ndk.exists()) {
+            throw new GradleException("Android NDK bulunamadı. Android Studio → SDK Manager → SDK Tools → NDK (Side by side) kur.")
+        }
+        def win = System.getProperty('os.name').toLowerCase().contains('win')
+        def clang = new File(ndk, "toolchains/llvm/prebuilt/${ndkHostTag()}/bin/clang" + (win ? '.exe' : ''))
+        def sources = ['packets.c', 'main.c', 'conev.c', 'proxy.c', 'desync.c', 'mpool.c', 'extend.c']
+                .collect { new File(byedpiDir, it).absolutePath }
+        CIADPI_ABIS.each { abi, triple ->
+            def outDir = new File(genJni.get().asFile, abi)
+            outDir.mkdirs()
+            def out = new File(outDir, 'libciadpi.so')
+            project.exec {
+                commandLine([clang.absolutePath, "--target=${triple}${MIN_SDK}",
+                             '-O2', '-std=c99', '-D_DEFAULT_SOURCE', "-I${byedpiDir.absolutePath}",
+                             '-fPIE', '-pie', '-Wl,-s', '-o', out.absolutePath] + sources)
+            }
+            logger.lifecycle("ciadpi → ${abi}: ${out.length()} bayt")
+        }
+    }
+}
+
+tasks.named('preBuild') { dependsOn copyEnexAssets, buildCiadpi }
