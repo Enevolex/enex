@@ -21,16 +21,16 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: android
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           lfs: true
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -41,7 +41,7 @@ jobs:
           yes | "$SDKM" --licenses > /dev/null || true
           "$SDKM" "platforms;android-35" "build-tools;35.0.0" "ndk;27.2.12479018" > /dev/null
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - name: İmza anahtarı (isteğe bağlı)
         env:
@@ -62,7 +62,16 @@ jobs:
           ENEX_KEY_PASSWORD: ${{ secrets.ENEX_KEY_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon assembleRelease
+          set +e
+          ./gradlew --no-daemon --stacktrace assembleRelease 2>&1 | tee "$RUNNER_TEMP/build.log"
+          code=${PIPESTATUS[0]}
+          set -e
+          if [ "$code" != "0" ]; then
+            # Hatayı özet olarak göster (kayıt dosyasını açmadan okunabilsin)
+            grep -nE "error:|warning: |What went wrong|Exception|> Task .* FAILED|FAILURE|Could not|not found|^e: " "$RUNNER_TEMP/build.log" | head -40 | while IFS= read -r l; do echo "::error::${l//%/%25}"; done
+            awk '/What went wrong/{f=1} f{print; n++} n>25{exit}' "$RUNNER_TEMP/build.log" | while IFS= read -r l; do echo "::error::${l//%/%25}"; done
+            exit "$code"
+          fi
           cp app/build/outputs/apk/release/app-release.apk ../Enex-Android.apk
 
       - uses: actions/upload-artifact@v4
