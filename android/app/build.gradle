@@ -26,7 +26,7 @@ android {
         targetSdk 35
         versionCode 1
         versionName '1.0.0'
-        ndk { abiFilters(*CIADPI_ABIS.keySet()) }
+        ndk { abiFilters.addAll(CIADPI_ABIS.keySet() as List) }
     }
 
     signingConfigs {
