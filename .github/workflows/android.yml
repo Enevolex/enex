@@ -1,0 +1,16 @@
+name: Enex Android
+
+on:
+  push:
+    branches: [android, main]
+    paths: ['android/**', 'themes/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ortam
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"; ls $ANDROID_HOME; ls $ANDROID_HOME/ndk || true; java -version
